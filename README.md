@@ -25,7 +25,7 @@ Here is step by step guide:
   * gnu-efi-devel
   * perl-File-Slurp
   * help2man
-  * Special patch for Make.rules to make it buildable, if you build it on Fedora. (Will be added shortly)
+  * (Only for Fedora) [Build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) which workarounds library paths problem.
 
 ### 2. Backup current UEFI keys
 
