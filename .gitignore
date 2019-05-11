@@ -1,0 +1,15 @@
+pubkey.gpg
+memdisk.tar
+grub-verify-unsigned.efi
+grub-verify.efi
+*.crt
+*.key
+*.esl
+*.auth
+gpg-home
+grub.cfg
+grub.passwd
+grub.passwd.tmp
+backup
+*.status
+*.sig

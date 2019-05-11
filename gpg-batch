@@ -1,0 +1,12 @@
+%echo Generating a basic OpenPGP key
+Key-Type: RSA
+Key-Length: 2048
+Key-Usage: sign
+Name-Real: Boot Signer
+Name-Email: bootsigner@localhost
+Expire-Date: 0
+%no-ask-passphrase
+%no-protection
+# Do a commit here, so that we can later print "done" :-)
+%commit
+%echo done
