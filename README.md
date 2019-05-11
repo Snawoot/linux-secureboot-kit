@@ -76,3 +76,7 @@ For Fedora 30 signing automation available via package hooks and can be installe
 ```
 sudo make fedora30-install
 ```
+
+### 7. Lockdown your system
+
+Ensure Secure Boot is enabled in your BIOS settings and administrator password is set.
