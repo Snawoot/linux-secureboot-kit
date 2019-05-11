@@ -77,6 +77,8 @@ For Fedora 30 signing automation available via package hooks and can be installe
 sudo make fedora30-install
 ```
 
+This command will install required hooks and trigger `kernel-core` package reinstallation to generate all signatures.
+
 ### 7. Lockdown your system
 
 Ensure Secure Boot is enabled in your BIOS settings and administrator password is set.
