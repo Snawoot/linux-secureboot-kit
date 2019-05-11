@@ -81,4 +81,4 @@ This command will install required hooks and trigger `kernel-core` package reins
 
 ### 7. Lockdown your system
 
-Ensure Secure Boot is enabled in your BIOS settings and administrator password is set.
+Ensure Secure Boot is enabled in your BIOS settings and administrator password is set. Set 'SignedBoot' UEFI boot entry as your first boot option.
