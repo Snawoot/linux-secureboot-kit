@@ -15,7 +15,8 @@ Here is step by step guide:
 
 ### 1. Satisfy requirements
 
-* x64 UEFI-enabled Linux installation
+* x64 UEFI-enabled Linux installation with GRUB2 bootloader
+* GRUB2 config without `load_env` and `save_env` directives (they will fail boot since all files will have to be signed). If your system uses `grub2-mkconfig` you may edit config templates in `/etc/grub.d` and comment it out and/or turn of related options in `/etc/default/grub`.
 * grub2-efi-x64-modules
 * grub2-tools
 * sbsigntools
@@ -62,3 +63,16 @@ sudo make install
 ```
 
 ### 6. Sign all kernels, ramdrives and boot config
+
+All new installed kernels, ramdrives and grub config has to be signed on update. Automation of this process may differ on various distros, but basicly all you have to do is generate detached signature with `gpg` like this:
+
+```sh
+FILE=/boot/vmlinuz-5.0.13-300.fc30.x86_64
+gpg2 --quiet --no-permission-warning --homedir /var/lib/secureboot/gpg-home --detach-sign --default-key "bootsigner@localhost" < "$FILE" > "$FILE.sig"
+```
+
+For Fedora 30 signing automation available via package hooks and can be installed like this:
+
+```
+sudo make fedora30-install
+```
