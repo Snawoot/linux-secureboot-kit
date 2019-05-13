@@ -1,11 +1,13 @@
 #!/bin/sh -e
 
-GRUBCFGLINK="/etc/grub2-efi.cfg"
+GRUBCFGLINK="$1"
+GRUB2PROBE="$2"
+GRUB2MKRELPATH="$3"
 
 GRUBCFGPATH="$(realpath "$GRUBCFGLINK")"
 
-CFGRELPATH="$(grub2-mkrelpath "$GRUBCFGPATH")"
-CFGDEV="$(grub2-probe -t device "$GRUBCFGPATH")"
+CFGRELPATH="$("$GRUB2MKRELPATH" "$GRUBCFGPATH")"
+CFGDEV="$("$GRUB2PROBE" -t device "$GRUBCFGPATH")"
 
 echo $CFGRELPATH
 echo $CFGDEV

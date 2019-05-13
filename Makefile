@@ -1,10 +1,12 @@
 EFIFS=/boot/efi
-GPG=gpg2
+GRUBCFGLINK:=$(shell ./locate-cfg.sh /etc/grub2-efi.cfg /etc/grub2.cfg /boot/grub2/grub.cfg)
+GPG:=$(shell ./locate-bin.sh gpg2 gpg)
 OPENSSL=openssl
 TAR=tar
-GRUB2MKIMAGE=grub2-mkimage
-GRUB2MKPASSWD=grub2-mkpasswd-pbkdf2
-GRUB2PROBE=grub2-probe
+GRUB2MKIMAGE:=$(shell ./locate-bin.sh grub2-mkimage grub-mkimage)
+GRUB2MKPASSWD:=$(shell ./locate-bin.sh grub2-mkpasswd-pbkdf2 grub-mkpasswd-pbkdf2)
+GRUB2MKRELPATH:=$(shell ./locate-bin.sh grub2-mkrelpath grub-mkrelpath)
+GRUB2PROBE:=$(shell ./locate-bin.sh grub2-probe grub-probe)
 RM=rm
 MKDIR=mkdir
 CP=cp
@@ -36,7 +38,7 @@ grub.cfg: grub.cfg.tmpl.sh grub.passwd
 
 boot/grub/grub.cfg: boot_grub_grub.cfg.tmpl.sh
 	$(MKDIR) -p boot/grub
-	./$< > $@
+	./$< "$(GRUBCFGLINK)" "$(GRUB2PROBE)" "$(GRUB2MKRELPATH)" > $@
 
 pgp-key: pubkey.gpg gpg-key-generated.status
 
