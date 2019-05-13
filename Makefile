@@ -1,5 +1,5 @@
 EFIFS=/boot/efi
-GRUBCFGLINK:=$(shell ./locate-cfg.sh /etc/grub2-efi.cfg /etc/grub2.cfg /boot/grub2/grub.cfg)
+GRUBCFGLINK:=$(shell ./locate-cfg.sh /etc/grub2-efi.cfg /etc/grub2.cfg /boot/grub2/grub.cfg /boot/grub/grub.cfg)
 GPG:=$(shell ./locate-bin.sh gpg2 gpg)
 OPENSSL=openssl
 TAR=tar
