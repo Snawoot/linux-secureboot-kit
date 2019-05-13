@@ -3,7 +3,7 @@ Tool for complete hardening of Linux boot chain with UEFI Secure Boot. Inspired 
 
 ## Why?
 
-Even if your harddisk is encrypted with full disk encryption, your bootloader config or initramdrive may be spoofed while you left your computer unattended. And this way your encryption key may be silently extracted when you unlock your system next time.
+Even if your hard disk is encrypted with full disk encryption, your bootloader config or initramdrive may be spoofed while you left your computer unattended. And this way your encryption key may be silently extracted when you unlock your system next time.
 
 ## What does it do?
 
@@ -16,7 +16,7 @@ Here is step by step guide:
 ### 1. Satisfy requirements
 
 * x64 UEFI-enabled Linux installation with GRUB2 bootloader
-* GRUB2 config without `load_env` and `save_env` directives (they will fail boot since all files will have to be signed). If your system uses `grub2-mkconfig` you may edit config templates in `/etc/grub.d` and comment it out and/or turn of related options in `/etc/default/grub`.
+* GRUB2 config without `load_env` and `save_env` directives (they will fail boot since all files will have to be signed). If your system uses `grub2-mkconfig` you may edit config templates in `/etc/grub.d` and comment it out and/or turn off related options in `/etc/default/grub`.
 * grub2-efi-x64-modules
 * grub2-tools
 * sbsigntools
