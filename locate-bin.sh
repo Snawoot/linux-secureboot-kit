@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 for i in "$@" ; do
     if which "$i" > /dev/null 2>&1 ; then
         echo "$i"

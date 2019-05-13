@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 for i in "$@" ; do
     if [ -h "$i" -o -e "$i" ] ; then
         echo "$i"

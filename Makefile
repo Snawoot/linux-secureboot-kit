@@ -7,6 +7,8 @@ GRUB2MKIMAGE:=$(shell ./locate-bin.sh grub2-mkimage grub-mkimage)
 GRUB2MKPASSWD:=$(shell ./locate-bin.sh grub2-mkpasswd-pbkdf2 grub-mkpasswd-pbkdf2)
 GRUB2MKRELPATH:=$(shell ./locate-bin.sh grub2-mkrelpath grub-mkrelpath)
 GRUB2PROBE:=$(shell ./locate-bin.sh grub2-probe grub-probe)
+GRUB2MODULES=all_video boot btrfs cat chain configfile echo efifwsetup efinet ext2 fat font gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg loadenv loopback lvm mdraid09 mdraid1x minicmd normal part_apple part_msdos part_gpt password_pbkdf2 png reboot search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs backtrace usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug linux tar memdisk verify gcry_rsa gcry_dsa gcry_sha256 hashsum
+GRUB2EXTRAMODULES=increment blscfg
 RM=rm
 MKDIR=mkdir
 CP=cp
@@ -29,7 +31,7 @@ password: grub.passwd
 grub.passwd:
 	@echo 'Set password for grub "root" user'
 	$(GRUB2MKPASSWD) --iteration-count=65536 | tee $@.tmp
-	$(GREP) -Eo 'grub\..+$$' $@.tmp > $@
+	$(GREP) -Eo 'grub\..+$$' $@.tmp > $@ || { $(RM) -f $@ $@.tmp ; false ; }
 	$(RM) -f $@.tmp
 	@echo "Password hash recorded to '$@'"
 
@@ -56,7 +58,7 @@ grub-verify.efi: grub-verify-unsigned.efi db.crt db.key
 	$(SBSIGN) --key db.key --cert db.crt --output $@ $<
 
 grub-verify-unsigned.efi: grub.cfg memdisk.tar pubkey.gpg
-	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar all_video boot btrfs cat chain configfile echo efifwsetup efinet ext2 fat font gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg loadenv loopback lvm mdraid09 mdraid1x minicmd normal part_apple part_msdos part_gpt password_pbkdf2 png reboot search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs backtrace usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug linux tar memdisk verify gcry_rsa gcry_dsa gcry_sha256 hashsum increment blscfg tga
+	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) $(GRUB2EXTRAMODULES)
 
 memdisk.tar: boot/grub/grub.cfg
 	$(TAR) cf $@ boot
