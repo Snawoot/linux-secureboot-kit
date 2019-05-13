@@ -13,7 +13,7 @@ This kit establishes following signature verification chain: UEFI Secure Boot ->
 
 Here is step by step guide:
 
-### 1. Satisfy requirements
+### Step 1. Satisfy requirements
 
 * x64 UEFI-enabled Linux installation with GRUB2 bootloader
 * GRUB2 config without `load_env` and `save_env` directives (they will fail boot since all files will have to be signed). If your system uses `grub2-mkconfig` you may edit config templates in `/etc/grub.d` and comment it out and/or turn off related options in `/etc/default/grub`.
@@ -27,13 +27,13 @@ Here is step by step guide:
   * help2man
   * (Only for Fedora) [Build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) which workarounds library paths problem.
 
-### 2. Backup current UEFI keys
+### Step 2. Backup current UEFI keys
 
 ```
 make backup
 ```
 
-### 3. Clear your current UEFI keys (putting platform into Setup Mode)
+### Step 3. Clear your current UEFI keys (putting platform into Setup Mode)
 
 Usually, it can be done via BIOS Setup Menu.
 
@@ -48,21 +48,29 @@ Variable dbx has no entries
 Variable MokList has no entries
 ```
 
-### 4. Build keys, certificates, signed grub2 image and password hash for grub2 `root` user 
+### Step 4. Build keys, certificates, signed grub2 image and password hash for grub2 `root` user 
 
 ```
 sudo make
 ```
 
-Root access is required for proper embedded boot config generation
+Root access is required for proper embedded boot config generation.
 
-### 5. Install UEFI keys, bootloader and boot GPG signing keys
+#### Debian 9
+
+On Debian 9 and older GRUB2 lacks some optional modules which are included by default. In this case use following build command:
+
+```
+sudo make GRUB2EXTRAMODULES=
+```
+
+### Step 5. Install UEFI keys, bootloader and boot GPG signing keys
 
 ```
 sudo make install
 ```
 
-### 6. Sign all kernels, ramdrives and boot config
+### Step 6. Sign all kernels, ramdrives and boot config
 
 All new installed kernels, ramdrives and grub config has to be signed on update. Automation of this process may differ on various distros, but basicly all you have to do is generate detached signature with `gpg` like this:
 
@@ -79,6 +87,6 @@ sudo make fedora30-install
 
 This command will install required hooks and trigger `kernel-core` package reinstallation to generate all signatures.
 
-### 7. Lockdown your system
+### Step 7. Lockdown your system
 
 Ensure Secure Boot is enabled in your BIOS settings and administrator password is set. Set 'SignedBoot' UEFI boot entry as your first boot option.
