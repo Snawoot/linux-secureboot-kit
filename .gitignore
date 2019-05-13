@@ -13,3 +13,4 @@ grub.passwd.tmp
 backup
 *.status
 *.sig
+*.uuid

@@ -64,7 +64,7 @@ memdisk.tar: boot/grub/grub.cfg
 	$(TAR) cf $@ boot
 
 clean:
-	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot
+	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot PK.crt.uuid
 
 efi-keys: PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
 
@@ -77,8 +77,11 @@ KEK.key KEK.crt:
 db.key db.crt:
 	$(OPENSSL) req -new -x509 -newkey rsa:2048 -subj "/CN=My Signing Key/" -keyout db.key -out db.crt -days 3650 -sha256 -nodes
 
-PK.esl: PK.crt
-	$(CERTTOEFISIGLIST) -g "$$(uuidgen)" $< $@
+PK.crt.uuid: uuidgen.sh PK.crt
+	./$< > $@ || { $(RM) -f $@ ; false ; }
+
+PK.esl: PK.crt PK.crt.uuid
+	$(CERTTOEFISIGLIST) -g "$$(cat $<.uuid)" $< $@
 
 PK.auth: PK.key PK.crt PK.esl
 	$(SIGNEFISIGLIST) -k PK.key -c PK.crt PK PK.esl PK.auth
