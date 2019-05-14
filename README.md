@@ -76,7 +76,10 @@ All new installed kernels, ramdrives and grub config has to be signed on update.
 
 ```sh
 FILE=/boot/vmlinuz-5.0.13-300.fc30.x86_64
-gpg2 --quiet --no-permission-warning --homedir /var/lib/secureboot/gpg-home --detach-sign --default-key "bootsigner@localhost" < "$FILE" > "$FILE.sig"
+gpg2 --quiet --no-permission-warning \
+    --homedir /var/lib/secureboot/gpg-home \
+    --detach-sign \
+    --default-key "bootsigner@localhost" < "$FILE" > "$FILE.sig"
 ```
 
 For some distros we already have such installable automation.
