@@ -58,10 +58,10 @@ Root access is required for proper embedded boot config generation.
 
 #### Debian 9
 
-On Debian 9 and older GRUB2 lacks some optional modules which are included by default. In this case use following build command:
+On Debian 9 and older GRUB2 lacks some optional modules which are included by default and requires additional `linuxefi` module. In this case use following build command:
 
 ```
-sudo make GRUB2EXTRAMODULES=
+sudo make GRUB2EXTRAMODULES=linuxefi
 ```
 
 ### Step 5. Install UEFI keys, bootloader and boot GPG signing keys
@@ -79,6 +79,10 @@ FILE=/boot/vmlinuz-5.0.13-300.fc30.x86_64
 gpg2 --quiet --no-permission-warning --homedir /var/lib/secureboot/gpg-home --detach-sign --default-key "bootsigner@localhost" < "$FILE" > "$FILE.sig"
 ```
 
+For some distros we already have such installable automation.
+
+#### Fedora 30
+
 For Fedora 30 signing automation available via package hooks and can be installed like this:
 
 ```
@@ -86,6 +90,16 @@ sudo make fedora30-install
 ```
 
 This command will install required hooks and trigger `kernel-core` package reinstallation to generate all signatures.
+
+#### Debian 9
+
+For Debian 9 signing automation available via package hooks and can be installed like this:
+
+```
+sudo make debian9-install
+```
+
+This command will install required hooks and reinstall all kernel packages present in system.
 
 ### Step 7. Lockdown your system
 
