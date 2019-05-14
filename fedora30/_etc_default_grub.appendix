@@ -1,3 +1,8 @@
+
+### Secure Boot signature hooks
+
+GRUB_ENABLE_BLSCFG="false" # BLS config will not work
+
 GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
 GPG_SIGN_KEYID="bootsigner@localhost"
 
