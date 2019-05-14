@@ -1,6 +1,9 @@
 GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
 GPG_SIGN_KEYID="bootsigner@localhost"
 
+GPG=$(command -v gpg2 2>/dev/null) || \
+GPG=$(command -v gpg 2>/dev/null)
+
 grub_cfg="${grub_cfg:-/boot/grub/grub.cfg}"
 # /etc/default/grub is sourced by grub2-mkconfig after grub-mkconfig_lib is
 # sourced. Overwrite grub_file_is_not_garbage to also ignore signature files.
@@ -32,7 +35,7 @@ sign() {
    >&2 echo "About to create signature of '${grub_cfg}' with GPG key '${GPG_SIGN_KEYID}'"
    # Don't warn about permissions, we're root and the homedir belongs to a
    # different user, so that's okay.
-   gpg2 --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${grub_cfg}" > "${grub_cfg}.sig"
+   "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${grub_cfg}" > "${grub_cfg}.sig"
    cleanup
 }
 trap sign EXIT
