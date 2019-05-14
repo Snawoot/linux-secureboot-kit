@@ -6,7 +6,7 @@ location="$2"
 GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
 GPG_SIGN_KEYID="bootsigner@localhost"
 
-function sign() {
+sign() {
     echo "About to sign file '${1}' with GPG key '${GPG_SIGN_KEYID}'"
     # Don't warn about permissions, we're root and the homedir belongs to a
     # different user, so that's okay.

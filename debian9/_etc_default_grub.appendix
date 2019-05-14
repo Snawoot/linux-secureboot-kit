@@ -28,7 +28,7 @@ export pkgdatadir="${TMPDIR}"
 cleanup() {
    rm -rf "${TMPDIR}"
 }
-function sign() {
+sign() {
    >&2 echo "About to create signature of '${grub_cfg}' with GPG key '${GPG_SIGN_KEYID}'"
    # Don't warn about permissions, we're root and the homedir belongs to a
    # different user, so that's okay.
