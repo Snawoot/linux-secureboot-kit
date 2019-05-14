@@ -9,9 +9,6 @@ GRUBCFGPATH="$(realpath "$GRUBCFGLINK")"
 CFGRELPATH="$("$GRUB2MKRELPATH" "$GRUBCFGPATH")"
 CFGDEV="$("$GRUB2PROBE" -t device "$GRUBCFGPATH")"
 
-echo $CFGRELPATH
-echo $CFGDEV
-
 . /usr/share/grub/grub-mkconfig_lib
 
 prepare_grub_to_access_device "$CFGDEV"
