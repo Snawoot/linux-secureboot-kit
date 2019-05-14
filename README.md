@@ -56,7 +56,7 @@ sudo make
 
 Root access is required for proper embedded boot config generation.
 
-#### Debian 9
+#### Debian 9 notes
 
 On Debian 9 and older GRUB2 lacks some optional modules which are included by default and requires additional `linuxefi` module. In this case use following build command:
 
