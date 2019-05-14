@@ -30,6 +30,10 @@ Here is step by step guide:
 
 On Fedora you'll need this [build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) for efitools which workarounds library paths problem.
 
+#### Debian 10 notes
+
+Debian 10 provides `efitools` package with efitools version 1.8.1, but this version produces non-usable signature list and/or authentication header. Therefore, you have to build `efitools` yourself. Version 1.9.2 is known to work well.
+
 ### Step 2. Backup current UEFI keys
 
 ```
@@ -59,17 +63,13 @@ sudo make
 
 Root access is required for proper embedded boot config generation.
 
-#### Debian 9 notes
+#### Debian 9 and Debian 10 notes
 
-On Debian 9 and older GRUB2 lacks some optional modules which are included by default and requires additional `linuxefi` module. In this case use following build command:
+Debian requires slightly different set of modules to build GRUB2 image. For this case use following build command:
 
 ```
 sudo make GRUB2EXTRAMODULES=linuxefi
 ```
-
-#### Debian 10 notes
-
-Debian 10 provides `efitools` package with efitools version 1.8.1, but this version produces non-usable signature list and/or authentication header. Therefore, you have to build `efitools` yourself. Version 1.9.2 is known to work well. Also, notes for Debian 9 apply to Debian 10.
 
 ### Step 5. Install UEFI keys, bootloader and boot GPG signing keys
 
