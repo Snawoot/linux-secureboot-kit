@@ -23,7 +23,7 @@ menuentry "Signed Internal Drive" --unrestricted {
     if verify_detached ${CFGRELPATH} ${CFGRELPATH}.sig; then
        configfile ${CFGRELPATH}
     else
-       echo Could verify ${CFGRELPATH}
+       echo "Could not verify ${CFGRELPATH}"
     fi
 }
 EOF
