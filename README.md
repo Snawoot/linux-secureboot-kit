@@ -30,9 +30,9 @@ Here is step by step guide:
 
 On Fedora you'll need this [build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) for efitools which workarounds library paths problem.
 
-#### Debian 10 notes
+#### Debian 10, Ubuntu notes
 
-Debian 10 provides `efitools` package with efitools version 1.8.1, but this version produces non-usable signature list and/or authentication header. Therefore, you have to build `efitools` yourself. Version 1.9.2 is known to work well.
+Debian 10 and Ubuntu provide `efitools` package with outdated `efitools`, but this version produces non-usable signature list and/or authentication header. Therefore, you have to build efitools yourself. Version 1.9.2 is known to work well.
 
 ### Step 2. Backup current UEFI keys
 
