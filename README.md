@@ -16,16 +16,19 @@ Here is step by step guide:
 ### Step 1. Satisfy requirements
 
 * x64 UEFI-enabled Linux installation with GRUB2 bootloader
-* GRUB2 config without `load_env` and `save_env` directives (they will fail boot since all files will have to be signed). If your system uses `grub2-mkconfig` you may edit config templates in `/etc/grub.d` and comment it out and/or turn off related options in `/etc/default/grub`.
+* GRUB2 config without `blscfg` directives (they will fail boot since all files will have to be signed). Where applicable it is disabled automatically upon installation via `GRUB_ENABLE_BLSCFG="false"` variable in `/etc/default/grub`
 * grub2-efi-x64-modules
 * grub2-tools
-* sbsigntools
-* efitools (https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git). Later one is absent in Fedora repos, so you have to build it yourself. You'll need:
-  * openssl-devel
-  * gnu-efi-devel
-  * perl-File-Slurp
+* sbsigntools (sbsigntool)
+* efitools (https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git). If it is absent in your distro, you have to build it yourself. You'll need:
+  * openssl-devel (libssl-dev)
+  * gnu-efi-devel (gnu-efi)
+  * perl-File-Slurp (libfile-slurp-perl)
   * help2man
-  * (Only for Fedora) [Build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) which workarounds library paths problem.
+
+#### Fedora 30 notes
+
+On Fedora you'll need this [build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) for efitools which workarounds library paths problem.
 
 ### Step 2. Backup current UEFI keys
 
