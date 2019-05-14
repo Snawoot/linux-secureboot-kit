@@ -23,6 +23,8 @@ SIGNEFISIGLIST=sign-efi-sig-list
 TOUCH=touch
 INSTALL=install
 DNF=dnf
+APT=apt-get
+DPKG=dpkg
 
 all: image efi-keys pgp-key
 
@@ -138,9 +140,25 @@ fedora30-kernel-signer.status: fedora30/99-sign-kernel.install
 	$(INSTALL) -g root -o root -t /etc/kernel/install.d $^
 	$(TOUCH) $@
 
+debian9-install: debian9-sign.status install
+
+debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status
+	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | $(GREP) -Po '^linux-image-\S+-amd64(?=\s+install)')
+	$(TOUCH) $@
+
+debian9-grub-signer.status: debian9/_etc_default_grub.appendix
+	echo >> /etc/default/grub
+	$(CAT) $< >> /etc/default/grub
+	$(TOUCH) $@
+
+debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel debian9/postrm.d_zzz-sign-kernel
+	$(INSTALL) -g root -o root -T debian9/postinst.d_zzz-sign-kernel /etc/kernel/postinst.d/zzz-sign-kernel
+	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel /etc/kernel/postrm.d/zzz-sign-kernel
+	$(TOUCH) $@
+
 backup/%.esl:
 	[ ! -f install-efi-keys.status ] # disable backup target if keys already installed
 	[ -d backup ] || $(MKDIR) -p backup
 	$(EFIREADVAR) -v $* -o $@
 
-.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys password install-boot-entry install-image install-efi-keys install fedora30-install
+.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys password install-boot-entry install-image install-efi-keys install fedora30-install debian9-install
