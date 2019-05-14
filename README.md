@@ -63,13 +63,13 @@ Root access is required for proper embedded boot config generation.
 
 On Debian 9 and older GRUB2 lacks some optional modules which are included by default and requires additional `linuxefi` module. In this case use following build command:
 
-#### Debian 10 notes
-
-Debian 10 provides `efitools` package with efitools version 1.8.1, but this version produces non-usable signature list and/or authentication header. Therefore, you have to build `efitools` yourself. Version 1.9.2 is known to work well.
-
 ```
 sudo make GRUB2EXTRAMODULES=linuxefi
 ```
+
+#### Debian 10 notes
+
+Debian 10 provides `efitools` package with efitools version 1.8.1, but this version produces non-usable signature list and/or authentication header. Therefore, you have to build `efitools` yourself. Version 1.9.2 is known to work well. Also, notes for Debian 9 apply to Debian 10.
 
 ### Step 5. Install UEFI keys, bootloader and boot GPG signing keys
 
