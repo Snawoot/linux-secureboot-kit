@@ -32,13 +32,12 @@ prepare_grub_to_access_device "$CFGDEV"
 
 cat <<EOF
 set prefix="${PFXRELPATH}"
-menuentry "Signed Internal Drive" --unrestricted {
-    # load a signed stage2 configuration from boot drive
-    if verify_detached ${CFGRELPATH} ${CFGRELPATH}.sig; then
-       configfile ${CFGRELPATH}
-    else
-       echo Could verify ${CFGRELPATH}
-    fi
-}
+# load a signed stage2 configuration from boot drive
+if verify_detached ${CFGRELPATH} ${CFGRELPATH}.sig; then
+   configfile ${CFGRELPATH}
+else
+   echo Could not verify ${CFGRELPATH}
+   sleep --interruptible 10
+fi
 EOF
 
