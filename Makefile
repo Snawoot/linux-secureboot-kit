@@ -144,6 +144,8 @@ debian9-install: debian9-sign.status install
 
 debian10-install: debian9-install
 
+ubuntu-install: ubuntu-sign.status install
+
 debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status install-gpg-keys.status
 	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | $(GREP) -Po '^linux-image-\S+-amd64(?=\s+install)')
 	$(TOUCH) $@
@@ -158,9 +160,13 @@ debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel debian9/postrm.
 	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel /etc/kernel/postrm.d/zzz-sign-kernel
 	$(TOUCH) $@
 
+ubuntu-sign.status: debian9-grub-signer.status debian9-kernel-signer.status install-gpg-keys.status
+	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | $(GREP) -Po '^linux-image-\S+-\S+(?=\s+install)')
+	$(TOUCH) $@
+
 backup/%.esl:
 	[ ! -f install-efi-keys.status ] # disable backup target if keys already installed
 	[ -d backup ] || $(MKDIR) -p backup
 	$(EFIREADVAR) -v $* -o $@
 
-.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys password install-boot-entry install-image install-efi-keys install fedora30-install debian9-install debian10-install
+.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys password install-boot-entry install-image install-efi-keys install fedora30-install debian9-install debian10-install ubuntu-install

@@ -111,6 +111,16 @@ sudo make debian9-install
 
 This command will install required hooks and reinstall all kernel packages present in system.
 
+#### Ubuntu
+
+For Ubuntu signing automation available via package hooks and can be installed like this:
+
+```
+sudo make ubuntu-install
+```
+
+This command will install required hooks and reinstall all kernel packages present in system.
+
 ### Step 7. Lockdown your system
 
 Ensure Secure Boot is enabled in your BIOS settings and administrator password is set. Set 'SignedBoot' UEFI boot entry as your first boot option.
