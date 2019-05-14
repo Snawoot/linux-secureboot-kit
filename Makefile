@@ -127,31 +127,31 @@ install: install-efi-keys install-gpg-keys install-image install-boot-entry
 
 fedora30-install: fedora30-sign.status install
 
-fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status
+fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status install
 	$(DNF) reinstall -y kernel-core
 	$(TOUCH) $@
 
-fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix
+fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix install
 	echo >> /etc/default/grub
 	$(CAT) $< >> /etc/default/grub
 	$(TOUCH) $@
 
-fedora30-kernel-signer.status: fedora30/99-sign-kernel.install
+fedora30-kernel-signer.status: fedora30/99-sign-kernel.install install
 	$(INSTALL) -g root -o root -t /etc/kernel/install.d $^
 	$(TOUCH) $@
 
 debian9-install: debian9-sign.status install
 
-debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status
+debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status install
 	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | $(GREP) -Po '^linux-image-\S+-amd64(?=\s+install)')
 	$(TOUCH) $@
 
-debian9-grub-signer.status: debian9/_etc_default_grub.appendix
+debian9-grub-signer.status: debian9/_etc_default_grub.appendix install
 	echo >> /etc/default/grub
 	$(CAT) $< >> /etc/default/grub
 	$(TOUCH) $@
 
-debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel debian9/postrm.d_zzz-sign-kernel
+debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel debian9/postrm.d_zzz-sign-kernel install
 	$(INSTALL) -g root -o root -T debian9/postinst.d_zzz-sign-kernel /etc/kernel/postinst.d/zzz-sign-kernel
 	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel /etc/kernel/postrm.d/zzz-sign-kernel
 	$(TOUCH) $@
