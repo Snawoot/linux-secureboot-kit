@@ -55,10 +55,10 @@ gpg-key-generated.status: gpg-batch
 image: grub-verify.efi
 
 grub-verify.efi: grub-verify-unsigned.efi db.crt db.key
-	$(SBSIGN) --key db.key --cert db.crt --output $@ $<
+	$(SBSIGN) --key db.key --cert db.crt --output $@ $< || { $(RM) -f $@ ; false ; }
 
 grub-verify-unsigned.efi: grub.cfg memdisk.tar pubkey.gpg
-	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) $(GRUB2EXTRAMODULES)
+	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) $(GRUB2EXTRAMODULES) || { $(RM) -f $@ ; false ; }
 
 memdisk.tar: boot/grub/grub.cfg
 	$(TAR) cf $@ boot
