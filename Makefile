@@ -142,6 +142,8 @@ fedora30-kernel-signer.status: fedora30/99-sign-kernel.install install-gpg-keys.
 
 debian9-install: debian9-sign.status install
 
+debian10-install: debian9-install
+
 debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status install-gpg-keys.status
 	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | $(GREP) -Po '^linux-image-\S+-amd64(?=\s+install)')
 	$(TOUCH) $@
@@ -161,4 +163,4 @@ backup/%.esl:
 	[ -d backup ] || $(MKDIR) -p backup
 	$(EFIREADVAR) -v $* -o $@
 
-.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys password install-boot-entry install-image install-efi-keys install fedora30-install debian9-install
+.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys password install-boot-entry install-image install-efi-keys install fedora30-install debian9-install debian10-install

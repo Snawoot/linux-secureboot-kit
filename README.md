@@ -101,9 +101,9 @@ sudo make fedora30-install
 
 This command will install required hooks and trigger `kernel-core` package reinstallation to generate all signatures.
 
-#### Debian 9
+#### Debian 9, Debian 10
 
-For Debian 9 signing automation available via package hooks and can be installed like this:
+For Debian 9 and 10 signing automation available via package hooks and can be installed like this:
 
 ```
 sudo make debian9-install
