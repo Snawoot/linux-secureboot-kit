@@ -7,8 +7,10 @@ GRUB2PROBE="$2"
 GRUB2MKRELPATH="$3"
 
 GRUBCFGPATH="$(realpath "$GRUBCFGLINK")"
+GRUBPFXPATH="$(dirname "$GRUBCFGPATH")"
 
 CFGRELPATH="$("$GRUB2MKRELPATH" "$GRUBCFGPATH")"
+PFXRELPATH="$("$GRUB2MKRELPATH" "$GRUBPFXPATH")"
 CFGDEV="$("$GRUB2PROBE" -t device "$GRUBCFGPATH")"
 GRUB_ROOT_PASSWD="$(cat grub.passwd)"
 
@@ -29,6 +31,7 @@ EOF
 prepare_grub_to_access_device "$CFGDEV"
 
 cat <<EOF
+set prefix="${PFXRELPATH}"
 menuentry "Signed Internal Drive" --unrestricted {
     # load a signed stage2 configuration from boot drive
     if verify_detached ${CFGRELPATH} ${CFGRELPATH}.sig; then

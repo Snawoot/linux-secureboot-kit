@@ -55,7 +55,7 @@ grub-verify.efi: grub-verify-unsigned.efi db.crt db.key
 	$(SBSIGN) --key db.key --cert db.crt --output $@ $< || { $(RM) -f $@ ; false ; }
 
 grub-verify-unsigned.efi: grub.cfg pubkey.gpg
-	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg $(GRUB2MODULES) $(GRUB2EXTRAMODULES) || { $(RM) -f $@ ; false ; }
+	$(GRUB2MKIMAGE) --prefix=/boot/grub --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg $(GRUB2MODULES) $(GRUB2EXTRAMODULES) || { $(RM) -f $@ ; false ; }
 
 clean:
 	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot PK.crt.uuid
