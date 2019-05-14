@@ -1,0 +1,31 @@
+#!/bin/sh -e
+
+version="$1"
+location="$2"
+
+if [ -z "${version}" ]; then
+	echo >&2 "W: sign-kernel: ${DPKG_MAINTSCRIPT_PACKAGE:-kernel package} did not pass a version number"
+	exit 2
+fi
+
+if [ -z "$location" ] ; then
+    location="/boot/vmlinux-$version"
+    if [ ! -e "$location" ] ; then
+        location="/boot/vmlinuz-$version"
+        if [ ! -e "$location" ] ; then
+            echo >&2 "W: sign-kernel: kernel image not found"
+            exit 1
+        fi
+    fi
+fi
+
+rm -f "$location.sig"
+
+# exit if kernel does not need an initramfs
+if [ "$INITRD" = 'No' ]; then
+	exit 0
+fi
+
+initrd = "/boot/initrd.img-$version"
+
+rm -f "$initrd.sig"

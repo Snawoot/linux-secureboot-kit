@@ -1,0 +1,46 @@
+#!/bin/sh -e
+
+version="$1"
+location="$2"
+
+GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
+GPG_SIGN_KEYID="bootsigner@localhost"
+
+function sign() {
+    echo "About to sign file '${1}' with GPG key '${GPG_SIGN_KEYID}'"
+    # Don't warn about permissions, we're root and the homedir belongs to a
+    # different user, so that's okay.
+    gpg2 --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${1}" > "${2}"
+}
+
+if [ -z "${version}" ]; then
+	echo >&2 "W: sign-kernel: ${DPKG_MAINTSCRIPT_PACKAGE:-kernel package} did not pass a version number"
+	exit 2
+fi
+
+if [ -z "$location" ] ; then
+    location="/boot/vmlinux-$version"
+    if [ ! -e "$location" ] ; then
+        location="/boot/vmlinuz-$version"
+        if [ ! -e "$location" ] ; then
+            echo >&2 "W: sign-kernel: kernel image not found"
+            exit 1
+        fi
+    fi
+fi
+
+sign "$location" "$location.sig"
+
+# exit if kernel does not need an initramfs
+if [ "$INITRD" = 'No' ]; then
+	exit 0
+fi
+
+initrd = "/boot/initrd.img-$version"
+
+if [ -e "$initrd" ] ; then
+	sign "$initrd" "$initrd.sig"
+else
+	echo >&2 "W: sign-kernel: initramfs image not found and not signed!"
+	exit 1
+fi
