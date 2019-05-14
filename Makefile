@@ -2,7 +2,6 @@ EFIFS=/boot/efi
 GRUBCFGLINK:=$(shell ./locate-cfg.sh /etc/grub2-efi.cfg /etc/grub2.cfg /boot/grub2/grub.cfg /boot/grub/grub.cfg)
 GPG:=$(shell ./locate-bin.sh gpg2 gpg)
 OPENSSL=openssl
-TAR=tar
 GRUB2MKIMAGE:=$(shell ./locate-bin.sh grub2-mkimage grub-mkimage)
 GRUB2MKPASSWD:=$(shell ./locate-bin.sh grub2-mkpasswd-pbkdf2 grub-mkpasswd-pbkdf2)
 GRUB2MKRELPATH:=$(shell ./locate-bin.sh grub2-mkrelpath grub-mkrelpath)
@@ -38,11 +37,7 @@ grub.passwd:
 	@echo "Password hash recorded to '$@'"
 
 grub.cfg: grub.cfg.tmpl.sh grub.passwd
-	./$< > $@
-
-boot/grub/grub.cfg: boot_grub_grub.cfg.tmpl.sh
-	$(MKDIR) -p boot/grub
-	./$< "$(GRUBCFGLINK)" "$(GRUB2PROBE)" "$(GRUB2MKRELPATH)" > $@
+	./$< "$(GRUBCFGLINK)" "$(GRUB2PROBE)" "$(GRUB2MKRELPATH)" > $@ || { $(RM) -f $@ ; false ; }
 
 pgp-key: pubkey.gpg gpg-key-generated.status
 
@@ -59,14 +54,11 @@ image: grub-verify.efi
 grub-verify.efi: grub-verify-unsigned.efi db.crt db.key
 	$(SBSIGN) --key db.key --cert db.crt --output $@ $< || { $(RM) -f $@ ; false ; }
 
-grub-verify-unsigned.efi: grub.cfg memdisk.tar pubkey.gpg
-	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) $(GRUB2EXTRAMODULES) || { $(RM) -f $@ ; false ; }
-
-memdisk.tar: boot/grub/grub.cfg
-	$(TAR) cf $@ boot
+grub-verify-unsigned.efi: grub.cfg pubkey.gpg
+	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg $(GRUB2MODULES) $(GRUB2EXTRAMODULES) || { $(RM) -f $@ ; false ; }
 
 clean:
-	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot PK.crt.uuid
+	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot PK.crt.uuid
 
 efi-keys: PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
 
