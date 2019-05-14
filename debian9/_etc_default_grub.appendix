@@ -39,7 +39,7 @@ sign() {
     >&2 echo "Config signed. Signing bootloader files in /boot/grub"
     find /boot/grub -type f -not \( -name \*.sig -or \
         -name grubenv -or -name grub.cfg \) -print0 | \
-    while read -d $'\0' i
+    while read -r i
     do
         "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${i}" > "${i}.sig"
     done
