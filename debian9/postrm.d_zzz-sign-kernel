@@ -26,6 +26,6 @@ if [ "$INITRD" = 'No' ]; then
 	exit 0
 fi
 
-initrd = "/boot/initrd.img-$version"
+initrd="/boot/initrd.img-$version"
 
 rm -f "$initrd.sig"
