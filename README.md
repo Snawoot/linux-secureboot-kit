@@ -20,13 +20,13 @@ Here is step by step guide:
 3. GRUB2 tools and modules (grub2-efi-x64-modules and grub2-tools on RPM-based distros, Debian-based provides them by default)
 4. sbsigntools (sbsigntool)
 5. efitools 1.9.2+ (https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git). If it is absent in your distro or too old, you have two options:
-  * Use [static build](https://gist.github.com/Snawoot/1937d5bc76d7b0a29f2039aa679c0449). HEAD commit of this gist can be verified with [my PGP public key](https://keybase.io/yarmak/pgp_keys.asc).
-  * Build it yourself. You'll need:
-    1. @development-tools (build-essential)
-    2. openssl-devel (libssl-dev)
-    3. gnu-efi-devel (gnu-efi)
-    4. perl-File-Slurp (libfile-slurp-perl)
-    5. help2man
+   * Use [static build](https://gist.github.com/Snawoot/1937d5bc76d7b0a29f2039aa679c0449). HEAD commit of this gist can be verified with [my PGP public key](https://keybase.io/yarmak/pgp_keys.asc).
+   * Build it yourself. You'll need:
+     1. @development-tools (build-essential)
+     2. openssl-devel (libssl-dev)
+     3. gnu-efi-devel (gnu-efi)
+     4. perl-File-Slurp (libfile-slurp-perl)
+     5. help2man
 
 #### Fedora 30 hint
 
