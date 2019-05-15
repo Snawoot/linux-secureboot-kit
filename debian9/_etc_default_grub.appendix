@@ -1,3 +1,6 @@
+
+### Secure Boot signature hooks below
+
 GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
 GPG_SIGN_KEYID="bootsigner@localhost"
 
