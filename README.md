@@ -15,24 +15,22 @@ Here is step by step guide:
 
 ### Step 1. Satisfy requirements
 
-* x64 UEFI-enabled Linux installation with GRUB2 bootloader
-* GRUB2 config without `blscfg` directives (they will fail boot since all files will have to be signed). Where applicable it is disabled automatically upon installation via `GRUB_ENABLE_BLSCFG="false"` variable in `/etc/default/grub`
-* grub2-efi-x64-modules
-* grub2-tools
-* sbsigntools (sbsigntool)
-* efitools (https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git). If it is absent in your distro, you have to build it yourself. You'll need:
-  * openssl-devel (libssl-dev)
-  * gnu-efi-devel (gnu-efi)
-  * perl-File-Slurp (libfile-slurp-perl)
-  * help2man
+1. x64 UEFI-enabled Linux installation with GRUB2 bootloader
+2. GRUB2 config without `blscfg` directives (they will fail boot since all files will have to be signed). Where applicable it is disabled automatically upon installation via `GRUB_ENABLE_BLSCFG="false"` variable in `/etc/default/grub`
+3. GRUB2 tools and modules (grub2-efi-x64-modules and grub2-tools on RPM-based distros, Debian-based provides them by default)
+4. sbsigntools (sbsigntool)
+5. efitools 1.9.2+ (https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git). If it is absent in your distro or too old, you have two options:
+  * Use [static build](https://gist.github.com/Snawoot/1937d5bc76d7b0a29f2039aa679c0449). HEAD commit of this gist can be verified with [my PGP public key](https://keybase.io/yarmak/pgp_keys.asc).
+  * Build it yourself. You'll need:
+    1. @development-tools (build-essential)
+    2. openssl-devel (libssl-dev)
+    3. gnu-efi-devel (gnu-efi)
+    4. perl-File-Slurp (libfile-slurp-perl)
+    5. help2man
 
-#### Fedora 30 notes
+#### Fedora 30 hint
 
-On Fedora you'll need this [build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) for efitools which workarounds library paths problem.
-
-#### Debian 10, Ubuntu notes
-
-Debian 10 and Ubuntu provide `efitools` package with outdated `efitools`, but this version produces non-usable signature list and/or authentication header. Therefore, you have to build efitools yourself. Version 1.9.2 is known to work well.
+If you are building efitools on Fedora you'll need this [build script](https://gist.github.com/Snawoot/9cbad8a381b241c5bac5669d00f20620) to workaroud library paths issue.
 
 ### Step 2. Backup current UEFI keys
 
@@ -61,7 +59,7 @@ Variable MokList has no entries
 sudo make
 ```
 
-Root access is required for proper embedded boot config generation.
+Root access is required for proper embedded boot config generation. You will be asked for GRUB password during build process.
 
 #### Debian 9 and Debian 10 notes
 
@@ -93,33 +91,21 @@ For some distros we already have such installable automation.
 
 #### Fedora 30
 
-For Fedora 30 signing automation available via package hooks and can be installed like this:
-
 ```
 sudo make fedora30-install
 ```
 
-This command will install required hooks and trigger `kernel-core` package reinstallation to generate all signatures.
-
 #### Debian 9, Debian 10
-
-For Debian 9 and 10 signing automation available via package hooks and can be installed like this:
 
 ```
 sudo make debian9-install
 ```
 
-This command will install required hooks and reinstall all kernel packages present in system.
-
 #### Ubuntu
-
-For Ubuntu signing automation available via package hooks and can be installed like this:
 
 ```
 sudo make ubuntu-install
 ```
-
-This command will install required hooks and reinstall all kernel packages present in system.
 
 ### Step 7. Lockdown your system
 
