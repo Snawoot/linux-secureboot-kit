@@ -7,7 +7,14 @@ GRUB2MKIMAGE:=$(shell ./locate-bin.sh grub2-mkimage grub-mkimage)
 GRUB2MKPASSWD:=$(shell ./locate-bin.sh grub2-mkpasswd-pbkdf2 grub-mkpasswd-pbkdf2)
 GRUB2MKRELPATH:=$(shell ./locate-bin.sh grub2-mkrelpath grub-mkrelpath)
 GRUB2PROBE:=$(shell ./locate-bin.sh grub2-probe grub-probe)
-GRUB2MODULES=all_video boot btrfs cat chain configfile echo efifwsetup efinet ext2 fat font gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg loadenv loopback lvm mdraid09 mdraid1x minicmd normal part_apple part_msdos part_gpt password_pbkdf2 png reboot search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs backtrace usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug linux tar memdisk verify gcry_rsa gcry_dsa gcry_sha256 hashsum
+GRUB2MODULES= all_video boot btrfs cat chain configfile echo efifwsetup \
+  efinet ext2 fat font gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg \
+  loadenv loopback lvm mdraid09 mdraid1x minicmd normal part_apple \
+  part_msdos part_gpt password_pbkdf2 png reboot search search_fs_uuid \
+  search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs \
+  backtrace usb usbserial_common usbserial_pl2303 usbserial_ftdi \
+  usbserial_usbdebug linux tar memdisk verify gcry_rsa gcry_dsa gcry_sha256 \
+  hashsum
 GRUB2CONDMODULES=increment blscfg linuxefi
 GRUB2EXTRAMODULES=
 RM=rm
@@ -42,7 +49,8 @@ grub.cfg: grub.cfg.tmpl.sh grub.passwd
 	./$< > $@
 
 condmodules.lst: probe-grub-modules.sh
-	./$< "$(GRUB2MKIMAGE)" $(GRUB2CONDMODULES) > $@ || { $(RM) -f $@ ; false ; }
+	./$< "$(GRUB2MKIMAGE)" $(GRUB2CONDMODULES) > $@ || \
+		{ $(RM) -f $@ ; false ; }
 
 boot/grub/grub.cfg: boot_grub_grub.cfg.tmpl.sh
 	$(MKDIR) -p boot/grub
@@ -51,37 +59,52 @@ boot/grub/grub.cfg: boot_grub_grub.cfg.tmpl.sh
 pgp-key: pubkey.gpg gpg-key-generated.status
 
 pubkey.gpg: gpg-key-generated.status
-	GNUPGHOME=gpg-home $(GPG) --quiet --no-permission-warning --output pubkey.gpg --export bootsigner@localhost --yes
+	GNUPGHOME=gpg-home $(GPG) --quiet --no-permission-warning \
+		--output pubkey.gpg --export bootsigner@localhost --yes
 
 gpg-key-generated.status: gpg-batch
 	$(MKDIR) gpg-home && \
-	GNUPGHOME=gpg-home $(GPG) --quiet --no-permission-warning --batch --generate-key $<
+	GNUPGHOME=gpg-home $(GPG) --quiet --no-permission-warning \
+		--batch --generate-key $<
 	$(TOUCH) $@
 
 image: grub-verify.efi
 
 grub-verify.efi: grub-verify-unsigned.efi db.crt db.key
-	$(SBSIGN) --key db.key --cert db.crt --output $@ $< || { $(RM) -f $@ ; false ; }
+	$(SBSIGN) --key db.key --cert db.crt --output $@ $< || \
+		{ $(RM) -f $@ ; false ; }
 
 grub-verify-unsigned.efi: grub.cfg memdisk.tar pubkey.gpg condmodules.lst
-	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) $(GRUB2EXTRAMODULES) $$($(CAT) condmodules.lst) || { $(RM) -f $@ ; false ; }
+	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg \
+		--pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) \
+		$(GRUB2EXTRAMODULES) $$($(CAT) condmodules.lst) || \
+			{ $(RM) -f $@ ; false ; }
 
 memdisk.tar: boot/grub/grub.cfg
 	$(TAR) cf $@ boot
 
 clean:
-	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot PK.crt.uuid condmodules.lst
+	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar \
+		PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg \
+		grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot \
+		PK.crt.uuid condmodules.lst
 
 efi-keys: PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
 
 PK.key PK.crt:
-	$(OPENSSL) req -new -x509 -newkey rsa:2048 -subj "/CN=My UEFI Platform Key/" -keyout PK.key -out PK.crt -days 3650 -sha256 -nodes
+	$(OPENSSL) req -new -x509 -newkey rsa:2048 \
+		-subj "/CN=My UEFI Platform Key/" -keyout PK.key -out PK.crt \
+		-days 3650 -sha256 -nodes
 
 KEK.key KEK.crt:
-	$(OPENSSL) req -new -x509 -newkey rsa:2048 -subj "/CN=My UEFI Key Exchange Key/" -keyout KEK.key -out KEK.crt -days 3650 -sha256 -nodes
+	$(OPENSSL) req -new -x509 -newkey rsa:2048 \
+		-subj "/CN=My UEFI Key Exchange Key/" -keyout KEK.key -out KEK.crt \
+		-days 3650 -sha256 -nodes
 
 db.key db.crt:
-	$(OPENSSL) req -new -x509 -newkey rsa:2048 -subj "/CN=My Signing Key/" -keyout db.key -out db.crt -days 3650 -sha256 -nodes
+	$(OPENSSL) req -new -x509 -newkey rsa:2048 \
+		-subj "/CN=My Signing Key/" -keyout db.key -out db.crt -days 3650 \
+		-sha256 -nodes
 
 PK.crt.uuid: uuidgen.sh PK.crt
 	./$< > $@ || { $(RM) -f $@ ; false ; }
@@ -115,8 +138,10 @@ install-image.status: grub-verify.efi
 
 install-boot-entry: install-boot-entry.status
 
-install-boot-entry.status: install-image.status install-efi-keys.status install-gpg-keys.status
-	$(EFIBOOTMGR) -c -d $$($(GRUB2PROBE) -t disk $(EFIFS)) -L SignedBoot -l '\EFI\grub-verify\grub-verify.efi'
+install-boot-entry.status: install-image.status install-efi-keys.status \
+  install-gpg-keys.status
+	$(EFIBOOTMGR) -c -d $$($(GRUB2PROBE) -t disk $(EFIFS)) -L SignedBoot \
+		-l '\EFI\grub-verify\grub-verify.efi'
 	$(TOUCH) $@
 
 install-efi-keys: install-efi-keys.status
@@ -131,16 +156,19 @@ install: install-efi-keys install-gpg-keys install-image install-boot-entry
 
 fedora30-install: fedora30-sign.status install
 
-fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status install-gpg-keys.status
+fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status \
+  install-gpg-keys.status
 	$(DNF) reinstall -y kernel-core
 	$(TOUCH) $@
 
-fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix install-gpg-keys.status
+fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
+  install-gpg-keys.status
 	echo >> /etc/default/grub
 	$(CAT) $< >> /etc/default/grub
 	$(TOUCH) $@
 
-fedora30-kernel-signer.status: fedora30/99-sign-kernel.install install-gpg-keys.status
+fedora30-kernel-signer.status: fedora30/99-sign-kernel.install \
+  install-gpg-keys.status
 	$(INSTALL) -g root -o root -t /etc/kernel/install.d $^
 	$(TOUCH) $@
 
@@ -150,22 +178,30 @@ debian10-install: debian9-install
 
 ubuntu-install: ubuntu-sign.status install
 
-debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status install-gpg-keys.status
-	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | $(GREP) -Po '^linux-image-\S+-amd64(?=\s+install)')
+debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status \
+  install-gpg-keys.status
+	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | \
+		$(GREP) -Po '^linux-image-\S+-amd64(?=\s+install)')
 	$(TOUCH) $@
 
-debian9-grub-signer.status: debian9/_etc_default_grub.appendix install-gpg-keys.status
+debian9-grub-signer.status: debian9/_etc_default_grub.appendix \
+  install-gpg-keys.status
 	echo >> /etc/default/grub
 	$(CAT) $< >> /etc/default/grub
 	$(TOUCH) $@
 
-debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel debian9/postrm.d_zzz-sign-kernel install-gpg-keys.status
-	$(INSTALL) -g root -o root -T debian9/postinst.d_zzz-sign-kernel /etc/kernel/postinst.d/zzz-sign-kernel
-	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel /etc/kernel/postrm.d/zzz-sign-kernel
+debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
+  debian9/postrm.d_zzz-sign-kernel install-gpg-keys.status
+	$(INSTALL) -g root -o root -T debian9/postinst.d_zzz-sign-kernel \
+		/etc/kernel/postinst.d/zzz-sign-kernel
+	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel \
+		/etc/kernel/postrm.d/zzz-sign-kernel
 	$(TOUCH) $@
 
-ubuntu-sign.status: debian9-grub-signer.status debian9-kernel-signer.status install-gpg-keys.status
-	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | $(GREP) -Po '^linux-image-\S+-\S+(?=\s+install)')
+ubuntu-sign.status: debian9-grub-signer.status debian9-kernel-signer.status \
+  install-gpg-keys.status
+	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | \
+		$(GREP) -Po '^linux-image-\S+-\S+(?=\s+install)')
 	$(TOUCH) $@
 
 backup/%.esl:
@@ -173,4 +209,6 @@ backup/%.esl:
 	[ -d backup ] || $(MKDIR) -p backup
 	$(EFIREADVAR) -v $* -o $@
 
-.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys password install-boot-entry install-image install-efi-keys install fedora30-install debian9-install debian10-install ubuntu-install
+.PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys \
+  password install-boot-entry install-image install-efi-keys install \
+  fedora30-install debian9-install debian10-install ubuntu-install
