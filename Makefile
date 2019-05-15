@@ -8,7 +8,8 @@ GRUB2MKPASSWD:=$(shell ./locate-bin.sh grub2-mkpasswd-pbkdf2 grub-mkpasswd-pbkdf
 GRUB2MKRELPATH:=$(shell ./locate-bin.sh grub2-mkrelpath grub-mkrelpath)
 GRUB2PROBE:=$(shell ./locate-bin.sh grub2-probe grub-probe)
 GRUB2MODULES=all_video boot btrfs cat chain configfile echo efifwsetup efinet ext2 fat font gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg loadenv loopback lvm mdraid09 mdraid1x minicmd normal part_apple part_msdos part_gpt password_pbkdf2 png reboot search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs backtrace usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug linux tar memdisk verify gcry_rsa gcry_dsa gcry_sha256 hashsum
-GRUB2EXTRAMODULES=increment blscfg
+GRUB2CONDMODULES=increment blscfg linuxefi
+GRUB2EXTRAMODULES=
 RM=rm
 MKDIR=mkdir
 CP=cp
@@ -40,6 +41,9 @@ grub.passwd:
 grub.cfg: grub.cfg.tmpl.sh grub.passwd
 	./$< > $@
 
+condmodules.lst: probe-grub-modules.sh
+	./$< "$(GRUB2MKIMAGE)" $(GRUB2CONDMODULES) > $@ || { $(RM) -f $@ ; false ; }
+
 boot/grub/grub.cfg: boot_grub_grub.cfg.tmpl.sh
 	$(MKDIR) -p boot/grub
 	./$< "$(GRUBCFGLINK)" "$(GRUB2PROBE)" "$(GRUB2MKRELPATH)" > $@
@@ -59,14 +63,14 @@ image: grub-verify.efi
 grub-verify.efi: grub-verify-unsigned.efi db.crt db.key
 	$(SBSIGN) --key db.key --cert db.crt --output $@ $< || { $(RM) -f $@ ; false ; }
 
-grub-verify-unsigned.efi: grub.cfg memdisk.tar pubkey.gpg
-	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) $(GRUB2EXTRAMODULES) || { $(RM) -f $@ ; false ; }
+grub-verify-unsigned.efi: grub.cfg memdisk.tar pubkey.gpg condmodules.lst
+	$(GRUB2MKIMAGE) --format=x86_64-efi --output=$@ --config=grub.cfg --pubkey=pubkey.gpg --memdisk=memdisk.tar $(GRUB2MODULES) $(GRUB2EXTRAMODULES) $$($(CAT) condmodules.lst) || { $(RM) -f $@ ; false ; }
 
 memdisk.tar: boot/grub/grub.cfg
 	$(TAR) cf $@ boot
 
 clean:
-	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot PK.crt.uuid
+	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot PK.crt.uuid condmodules.lst
 
 efi-keys: PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
 

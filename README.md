@@ -61,14 +61,6 @@ sudo make
 
 Root access is required for proper embedded boot config generation. You will be asked for GRUB password during build process.
 
-#### Debian 9 and Debian 10 notes
-
-Debian requires slightly different set of modules to build GRUB2 image. For this case use following build command:
-
-```
-sudo make GRUB2EXTRAMODULES=linuxefi
-```
-
 ### Step 5. Install UEFI keys, bootloader and boot GPG signing keys
 
 ```
