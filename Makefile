@@ -4,6 +4,7 @@ GPG:=$(shell ./locate-bin.sh gpg2 gpg)
 OPENSSL=openssl
 TAR=tar
 GRUB2MKIMAGE:=$(shell ./locate-bin.sh grub2-mkimage grub-mkimage)
+GRUB2MKCONFIG:=$(shell ./locate-bin.sh grub2-mkconfig grub-mkconfig)
 GRUB2MKPASSWD:=$(shell ./locate-bin.sh grub2-mkpasswd-pbkdf2 grub-mkpasswd-pbkdf2)
 GRUB2MKRELPATH:=$(shell ./locate-bin.sh grub2-mkrelpath grub-mkrelpath)
 GRUB2PROBE:=$(shell ./locate-bin.sh grub2-probe grub-probe)
@@ -30,7 +31,7 @@ CERTTOEFISIGLIST=cert-to-efi-sig-list
 SIGNEFISIGLIST=sign-efi-sig-list
 TOUCH=touch
 INSTALL=install
-DNF=dnf
+RPM=rpm
 APT=apt-get
 DPKG=dpkg
 
@@ -158,7 +159,13 @@ fedora30-install: fedora30-sign.status install
 
 fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status \
   install-gpg-keys.status
-	$(DNF) reinstall -y kernel-core
+	$(RPM) -q kernel-core | $(GREP) -Po '(?<=kernel-core-)\S+' | \
+		while read -r ver ; do \
+			/etc/kernel/install.d/99-sign-kernel.install \
+				add $$ver "" /boot/vmlinuz-$$ver ; \
+		done
+	$(GRUB2MKCONFIG) -o "$(GRUBCFGLINK)"
+	sh /etc/default/grub
 	$(TOUCH) $@
 
 fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
