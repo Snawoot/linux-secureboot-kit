@@ -105,6 +105,14 @@ sudo make debian9-install
 sudo make ubuntu-install
 ```
 
+#### Centos 7
+
+```
+sudo make centos7-install
+```
+
+Actually, you may just run single command with final target for your system and `make` will figure out which actions are pending. But step-by-step process is more explicit and easier to troubleshoot.
+
 ### Step 7. Lockdown your system
 
 Ensure Secure Boot is enabled in your BIOS settings and administrator password is set. Set 'SignedBoot' UEFI boot entry as your first boot option.
