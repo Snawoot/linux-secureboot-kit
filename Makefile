@@ -165,7 +165,6 @@ fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status 
 				add $$ver "" /boot/vmlinuz-$$ver ; \
 		done
 	$(GRUB2MKCONFIG) -o "$(GRUBCFGLINK)"
-	sh /etc/default/grub
 	$(TOUCH) $@
 
 fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
