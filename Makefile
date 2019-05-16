@@ -175,7 +175,7 @@ fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
 
 fedora30-kernel-signer.status: fedora30/99-sign-kernel.install \
   install-gpg-keys.status
-	$(INSTALL) -g root -o root -t /etc/kernel/install.d $^
+	$(INSTALL) -g root -o root -t /etc/kernel/install.d $<
 	$(TOUCH) $@
 
 debian9-install: debian9-sign.status install
