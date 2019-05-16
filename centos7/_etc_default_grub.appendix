@@ -1,0 +1,52 @@
+
+### Secure Boot signature hooks below
+
+GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
+GPG_SIGN_KEYID="bootsigner@localhost"
+
+GPG=$(command -v gpg2 2>/dev/null) || \
+GPG=$(command -v gpg 2>/dev/null)
+
+grub_cfg="${grub_cfg:-/boot/efi/EFI/centos/grub.cfg}"
+# /etc/default/grub is sourced by grub2-mkconfig after grub-mkconfig_lib is
+# sourced. Overwrite grub_file_is_not_garbage to also ignore signature files.
+echo default grub $0 "${@}"
+grub_file_is_not_garbage ()
+{
+ if test -f "$1" ; then
+   case "$1" in
+     *.dpkg-*) return 1 ;; # debian dpkg
+     *.rpmsave|*.rpmnew) return 1 ;;
+     *.sig) return 1 ;;
+     README*|*/README*)  return 1 ;; # documentation
+   esac
+ else
+   return 1
+ fi
+ return 0
+}
+# Unfortunately, this is not sufficient, as /etc/grub.d/10_linux sources
+# grub-mkconfig_lib again. It does try to do so from "${pkgdatadir}" though, so
+# that we can make it use a patched lib:
+TMPDIR="$(mktemp -d)"
+sed -e 's,\*\.rpmsave[^)]*),*.rpmsave|*.rpmnew|*.sig),' /usr/share/grub/grub-mkconfig_lib > "${TMPDIR}/grub-mkconfig_lib"
+export pkgdatadir="${TMPDIR}"
+cleanup() {
+    rm -rf "${TMPDIR}"
+}
+sign() {
+    >&2 echo "About to create signature of '${grub_cfg}' with GPG key '${GPG_SIGN_KEYID}'"
+    # Don't warn about permissions, we're root and the homedir belongs to a
+    # different user, so that's okay.
+    "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${grub_cfg}" > "${grub_cfg}.sig"
+    >&2 echo "Config signed. Signing bootloader files in /boot/grub"
+    find /boot/efi/EFI/centos/fonts/ /boot/grub/ -type f -not \( -name \*.sig \
+        -or -name grubenv -or -name grub.cfg \) | \
+    while read -r i
+    do
+        "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${i}" > "${i}.sig"
+    done
+    cleanup
+}
+trap sign EXIT
+trap cleanup TERM INT 
