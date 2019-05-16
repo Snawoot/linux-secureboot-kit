@@ -67,7 +67,7 @@ pubkey.gpg: gpg-key-generated.status
 gpg-key-generated.status: gpg-batch
 	$(MKDIR) gpg-home && \
 	GNUPGHOME=gpg-home $(GPG) --quiet --no-permission-warning \
-		--batch --generate-key $<
+		--batch --gen-key $<
 	$(TOUCH) $@
 
 image: grub-verify.efi
