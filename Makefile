@@ -34,6 +34,7 @@ INSTALL=install
 RPM=rpm
 FIND=find
 UPDATEGRUB=update-grub
+REALPATH=realpath
 
 all: image efi-keys pgp-key
 
@@ -164,7 +165,7 @@ fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status 
 			/etc/kernel/install.d/99-sign-kernel.install \
 				add $$ver "" /boot/vmlinuz-$$ver ; \
 		done
-	$(GRUB2MKCONFIG) -o "$(GRUBCFGLINK)"
+	$(GRUB2MKCONFIG) -o "$$($(REALPATH) "$(GRUBCFGLINK)")"
 	$(TOUCH) $@
 
 fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
