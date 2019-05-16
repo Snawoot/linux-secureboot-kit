@@ -35,6 +35,7 @@ RPM=rpm
 FIND=find
 UPDATEGRUB=update-grub
 REALPATH=realpath
+SED=sed
 
 all: image efi-keys pgp-key
 
@@ -226,6 +227,8 @@ centos7-grub-signer.status: centos7/_etc_default_grub.appendix \
   install-gpg-keys.status
 	echo >> /etc/default/grub
 	$(CAT) $< >> /etc/default/grub
+	$(SED) -i -re '/(\s*)if\s+grub_file_is_not_garbage/i echo "$$i" | grep -q .sig\\\$$ && continue' \
+		/etc/grub.d/10_linux /etc/grub.d/20_linux_xen
 	$(TOUCH) $@
 
 centos7-kernel-signer.status: centos7/postinst.d_99-sign-kernel.sh \
