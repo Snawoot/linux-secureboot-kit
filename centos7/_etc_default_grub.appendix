@@ -20,6 +20,5 @@ sign() {
     do
         "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${i}" > "${i}.sig"
     done
-    cleanup
 }
 trap sign EXIT
