@@ -211,6 +211,32 @@ debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
 		/etc/kernel/postrm.d/zzz-sign-kernel
 	$(TOUCH) $@
 
+centos7-install: centos7-sign.status install
+
+centos7-sign.status: centos7-grub-signer.status centos7-kernel-signer.status \
+  install-gpg-keys.status
+	$(RPM) -q kernel | $(GREP) -Po '(?<=kernel-)\S+' | \
+		while read -r ver ; do \
+			/etc/kernel/postinst.d/99-sign-kernel.sh $$ver ; \
+		done
+	$(GRUB2MKCONFIG) -o "$$($(REALPATH) "$(GRUBCFGLINK)")"
+	$(TOUCH) $@
+
+centos7-grub-signer.status: centos7/_etc_default_grub.appendix \
+  install-gpg-keys.status
+	echo >> /etc/default/grub
+	$(CAT) $< >> /etc/default/grub
+	$(TOUCH) $@
+
+centos7-kernel-signer.status: centos7/postinst.d_99-sign-kernel.sh \
+  centos7/postrm.d_99-sign-kernel.sh install-gpg-keys.status
+	$(MKDIR) -p /etc/kernel/postinst.d /etc/kernel/postrm.d
+	$(INSTALL) -g root -o root -t /etc/kernel/postinst.d \
+		centos7/postinst.d_99-sign-kernel.sh
+	$(INSTALL) -g root -o root -t /etc/kernel/postrm.d \
+		centos7/postrm.d_99-sign-kernel.sh
+	$(TOUCH) $@
+
 backup/%.esl:
 	[ ! -f install-efi-keys.status ] # disable backup target if keys already installed
 	[ -d backup ] || $(MKDIR) -p backup
@@ -218,4 +244,5 @@ backup/%.esl:
 
 .PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys \
   password install-boot-entry install-image install-efi-keys install \
-  fedora30-install debian9-install debian10-install ubuntu-install
+  fedora30-install debian9-install debian10-install ubuntu-install \
+  centos7-install
