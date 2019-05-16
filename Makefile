@@ -1,5 +1,6 @@
 EFIFS=/boot/efi
 GRUBCFGLINK:=$(shell ./locate-cfg.sh /etc/grub2-efi.cfg /etc/grub2.cfg /boot/grub2/grub.cfg /boot/grub/grub.cfg)
+GRUB2MKCFGLIB:=$(shell ./locate-cfg.sh /usr/share/grub2/grub-mkconfig_lib /usr/share/grub/grub-mkconfig_lib)
 GPG:=$(shell ./locate-bin.sh gpg2 gpg)
 OPENSSL=openssl
 TAR=tar
@@ -57,7 +58,7 @@ condmodules.lst: probe-grub-modules.sh
 
 boot/grub/grub.cfg: boot_grub_grub.cfg.tmpl.sh
 	$(MKDIR) -p boot/grub
-	./$< "$(GRUBCFGLINK)" "$(GRUB2PROBE)" "$(GRUB2MKRELPATH)" > $@
+	./$< "$(GRUBCFGLINK)" "$(GRUB2PROBE)" "$(GRUB2MKRELPATH)" "$(GRUB2MKCFGLIB)" > $@
 
 pgp-key: pubkey.gpg gpg-key-generated.status
 
