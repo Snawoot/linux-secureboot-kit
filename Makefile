@@ -231,10 +231,10 @@ centos7-grub-signer.status: centos7/_etc_default_grub.appendix \
 centos7-kernel-signer.status: centos7/postinst.d_99-sign-kernel.sh \
   centos7/postrm.d_99-sign-kernel.sh install-gpg-keys.status
 	$(MKDIR) -p /etc/kernel/postinst.d /etc/kernel/postrm.d
-	$(INSTALL) -g root -o root -t /etc/kernel/postinst.d \
-		centos7/postinst.d_99-sign-kernel.sh
-	$(INSTALL) -g root -o root -t /etc/kernel/postrm.d \
-		centos7/postrm.d_99-sign-kernel.sh
+	$(INSTALL) -g root -o root -T centos7/postinst.d_99-sign-kernel.sh \
+		/etc/kernel/postinst.d/99-sign-kernel.sh
+	$(INSTALL) -g root -o root -T centos7/postrm.d_99-sign-kernel.sh \
+		/etc/kernel/postrm.d/99-sign-kernel.sh
 	$(TOUCH) $@
 
 backup/%.esl:
