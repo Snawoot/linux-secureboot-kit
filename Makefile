@@ -176,6 +176,7 @@ fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
 
 fedora30-kernel-signer.status: fedora30/99-sign-kernel.install \
   install-gpg-keys.status
+	$(MKDIR) -p /etc/kernel/install.d
 	$(INSTALL) -g root -o root -t /etc/kernel/install.d $<
 	$(TOUCH) $@
 
@@ -203,6 +204,7 @@ debian9-grub-signer.status: debian9/_etc_default_grub.appendix \
 
 debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
   debian9/postrm.d_zzz-sign-kernel install-gpg-keys.status
+	$(MKDIR) -p /etc/kernel/postinst.d /etc/kernel/postrm.d
 	$(INSTALL) -g root -o root -T debian9/postinst.d_zzz-sign-kernel \
 		/etc/kernel/postinst.d/zzz-sign-kernel
 	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel \
