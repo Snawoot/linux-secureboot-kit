@@ -32,8 +32,8 @@ SIGNEFISIGLIST=sign-efi-sig-list
 TOUCH=touch
 INSTALL=install
 RPM=rpm
-APT=apt-get
-DPKG=dpkg
+FIND=find
+UPDATEGRUB=update-grub
 
 all: image efi-keys pgp-key
 
@@ -183,12 +183,16 @@ debian9-install: debian9-sign.status install
 
 debian10-install: debian9-install
 
-ubuntu-install: ubuntu-sign.status install
+ubuntu-install: debian9-install
 
 debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status \
   install-gpg-keys.status
-	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | \
-		$(GREP) -Po '^linux-image-\S+-amd64(?=\s+install)')
+	$(FIND) /boot/ -maxdepth 1 -type f -name 'vmlinu[xz]-*' \
+		-and -not -name \*.sig | $(GREP) -Po '(?<=^/boot/vmlinu[xz]-)\S+$$' | \
+			while read -r ver ; do \
+				/etc/kernel/postinst.d/zzz-sign-kernel $$ver ; \
+			done
+	$(UPDATEGRUB)
 	$(TOUCH) $@
 
 debian9-grub-signer.status: debian9/_etc_default_grub.appendix \
@@ -203,12 +207,6 @@ debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
 		/etc/kernel/postinst.d/zzz-sign-kernel
 	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel \
 		/etc/kernel/postrm.d/zzz-sign-kernel
-	$(TOUCH) $@
-
-ubuntu-sign.status: debian9-grub-signer.status debian9-kernel-signer.status \
-  install-gpg-keys.status
-	$(APT) install -y --reinstall $$(LANG=C $(DPKG) --get-selections | \
-		$(GREP) -Po '^linux-image-\S+-\S+(?=\s+install)')
 	$(TOUCH) $@
 
 backup/%.esl:
