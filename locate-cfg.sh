@@ -3,7 +3,7 @@
 set -e
 
 for i in "$@" ; do
-    if [ -h "$i" -o -e "$i" ] ; then
+    if [ -h "$i" ] || [ -e "$i" ] ; then
         echo "$i"
         exit 0
     fi
