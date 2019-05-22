@@ -12,6 +12,7 @@ CFGRELPATH="$("$GRUB2MKRELPATH" "$GRUBCFGPATH")"
 PFXRELPATH="$("$GRUB2MKRELPATH" "$GRUBPFXPATH")"
 CFGDEV="$("$GRUB2PROBE" -t device "$GRUBCFGPATH")"
 
+# shellcheck source=/usr/share/grub/grub-mkconfig_lib
 . "$GRUB2MKCFGLIB"
 
 prepare_grub_to_access_device "$CFGDEV"
