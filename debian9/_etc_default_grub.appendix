@@ -10,7 +10,6 @@ GPG=$(command -v gpg 2>/dev/null)
 grub_cfg="${grub_cfg:-/boot/grub/grub.cfg}"
 # /etc/default/grub is sourced by grub2-mkconfig after grub-mkconfig_lib is
 # sourced. Overwrite grub_file_is_not_garbage to also ignore signature files.
-echo default grub $0 "${@}"
 grub_file_is_not_garbage ()
 {
  if test -f "$1" ; then

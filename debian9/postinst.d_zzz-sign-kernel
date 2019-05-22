@@ -39,10 +39,10 @@ if [ "$INITRD" = 'No' ]; then
 	exit 0
 fi
 
-initrd="/boot/initrd.img-$version"
+initrd_img="/boot/initrd.img-$version"
 
-if [ -e "$initrd" ] ; then
-	sign "$initrd" "$initrd.sig"
+if [ -e "$initrd_img" ] ; then
+	sign "$initrd_img" "$initrd_img.sig"
 else
 	echo >&2 "W: sign-kernel: initramfs image not found and not signed!"
 	exit 1

@@ -1,8 +1,8 @@
 #!/bin/sh
 PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 KERNEL_VERSION="${1}"
+# shellcheck disable=SC2034
 KERNEL_IMAGE="${2}"
-MAIN_GRUB_CFG="/boot/efi/EFI/centos/grub.cfg"
 GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
 GPG_SIGN_KEYID="bootsigner@localhost"
 
