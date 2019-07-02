@@ -7,7 +7,7 @@ shift
 
 # Sanity check
 "$GRUB2MKIMAGE" -p /boot/grub --format=x86_64-efi \
-    --output=/dev/null >/dev/null || \
+    --output=log.txt >log.txt || \
 {
     echo >&2 "E: grub2 image builder is not usable"
     exit 1
@@ -16,8 +16,8 @@ shift
 for i in "$@" ; do
     "$GRUB2MKIMAGE" -p /boot/grub \
         --format=x86_64-efi \
-        --output=/dev/null \
-        "$i" >/dev/null 2>&1 && \
+        --output=log.txt \
+        "$i" >log.txt 2>&1 && \
     echo "$i"
 done
 
