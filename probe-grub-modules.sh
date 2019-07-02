@@ -21,4 +21,6 @@ for i in "$@" ; do
     echo "$i"
 done
 
+rm log.txt
+
 exit 0
