@@ -150,7 +150,7 @@ install-boot-entry.status: install-image.status install-efi-keys.status \
 
 install-efi-keys: install-efi-keys.status
 
-install-efi-keys.status: efi-keys
+install-efi-keys.status: PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
 	$(INSTALL) -d -m 700 -o root -g root /var/lib/secureboot/efi-keys
 	$(INSTALL) -m 700 -o root -g root -t /var/lib/secureboot/efi-keys \
 		PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
