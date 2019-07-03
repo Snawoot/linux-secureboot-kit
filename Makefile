@@ -128,7 +128,7 @@ efi-keys-backup: backup/PK.esl backup/KEK.esl backup/db.esl backup/dbx.esl
 install-gpg-keys: install-gpg-keys.status
 
 install-gpg-keys.status: gpg-key-generated.status
-	$(MKDIR) -p /var/lib/secureboot
+	$(INSTALL) -d -m 700 -o root -g root /var/lib/secureboot
 	$(RM) -rf /var/lib/secureboot/gpg-home
 	$(CP) -rvp gpg-home /var/lib/secureboot
 	$(TOUCH) $@
@@ -150,7 +150,10 @@ install-boot-entry.status: install-image.status install-efi-keys.status \
 
 install-efi-keys: install-efi-keys.status
 
-install-efi-keys.status: KEK.crt db.crt PK.auth
+install-efi-keys.status: efi-keys
+	$(INSTALL) -d -m 700 -o root -g root /var/lib/secureboot/efi-keys
+	$(INSTALL) -m 700 -o root -g root -t /var/lib/secureboot/efi-keys \
+		PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
 	$(EFIUPDATEVAR) -c KEK.crt KEK
 	$(EFIUPDATEVAR) -c db.crt db
 	$(EFIUPDATEVAR) -f PK.auth PK
