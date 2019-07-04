@@ -110,6 +110,9 @@ db.key db.crt:
 		-subj "/CN=My Signing Key/" -keyout db.key -out db.crt -days 3650 \
 		-sha256 -nodes
 
+db.der: db.crt
+	$(OPENSSL) x509 -in $< -inform p -out $@ -outform d
+
 PK.crt.uuid: uuidgen.sh PK.crt
 	./$< > $@ || { $(RM) -f $@ ; false ; }
 
@@ -128,7 +131,7 @@ efi-keys-backup: backup/PK.esl backup/KEK.esl backup/db.esl backup/dbx.esl
 install-gpg-keys: install-gpg-keys.status
 
 install-gpg-keys.status: gpg-key-generated.status
-	$(INSTALL) -d -m 700 -o root -g root /var/lib/secureboot
+	$(INSTALL) -d -m 755 -o root -g root /var/lib/secureboot
 	$(RM) -rf /var/lib/secureboot/gpg-home
 	$(CP) -rvp gpg-home /var/lib/secureboot
 	$(TOUCH) $@
@@ -150,16 +153,34 @@ install-boot-entry.status: install-image.status install-efi-keys.status \
 
 install-efi-keys: install-efi-keys.status
 
-install-efi-keys.status: PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
+install-efi-keys.status: PK.crt KEK.crt db.crt db.der PK.key KEK.key db.key PK.esl PK.auth
+	$(INSTALL) -d -m 755 -o root -g root /var/lib/secureboot
 	$(INSTALL) -d -m 700 -o root -g root /var/lib/secureboot/efi-keys
-	$(INSTALL) -m 700 -o root -g root -t /var/lib/secureboot/efi-keys \
-		PK.crt KEK.crt db.crt PK.key KEK.key db.key PK.esl PK.auth
+	$(INSTALL) -m 600 -o root -g root -t /var/lib/secureboot/efi-keys \
+		PK.crt KEK.crt db.crt db.der PK.key KEK.key db.key PK.esl PK.auth
 	$(EFIUPDATEVAR) -c KEK.crt KEK
 	$(EFIUPDATEVAR) -c db.crt db
 	$(EFIUPDATEVAR) -f PK.auth PK
 	$(TOUCH) $@
 
-install: install-efi-keys install-gpg-keys install-image install-boot-entry
+install-dkms-hook: install-dkms-hook.status
+
+install-dkms-hook.status: chain-sign-hook.conf
+	$(INSTALL) -d -m 755 -o root -g root /var/lib/secureboot
+	$(INSTALL) -d -m 755 -o root -g root /var/lib/secureboot/dkms
+	$(INSTALL) -m 644 -o root -g root -t /var/lib/secureboot/dkms $<
+	$(TOUCH) $@
+
+setup-dkms: setup-dkms.status
+
+setup-dkms.status: setup_dkms.sh install-dkms-hook.status
+	$(INSTALL) -d -m 755 -o root -g root /var/lib/secureboot/dkms
+	$(INSTALL) -m 755 -o root -g root -t /var/lib/secureboot/dkms $<
+	/var/lib/secureboot/dkms/$<
+	$(TOUCH) $@
+
+install: install-efi-keys install-gpg-keys install-image install-boot-entry \
+  setup-dkms
 
 fedora30-install: fedora30-sign.status install
 
@@ -210,9 +231,9 @@ debian9-grub-signer.status: debian9/_etc_default_grub.appendix \
 debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
   debian9/postrm.d_zzz-sign-kernel install-gpg-keys.status
 	$(MKDIR) -p /etc/kernel/postinst.d /etc/kernel/postrm.d
-	$(INSTALL) -g root -o root -T debian9/postinst.d_zzz-sign-kernel \
+	$(INSTALL) -m 755 -g root -o root -T debian9/postinst.d_zzz-sign-kernel \
 		/etc/kernel/postinst.d/zzz-sign-kernel
-	$(INSTALL) -g root -o root -T debian9/postrm.d_zzz-sign-kernel \
+	$(INSTALL) -m 755 -g root -o root -T debian9/postrm.d_zzz-sign-kernel \
 		/etc/kernel/postrm.d/zzz-sign-kernel
 	$(TOUCH) $@
 
@@ -238,9 +259,9 @@ centos7-grub-signer.status: centos7/_etc_default_grub.appendix \
 centos7-kernel-signer.status: centos7/postinst.d_99-sign-kernel.sh \
   centos7/postrm.d_99-sign-kernel.sh install-gpg-keys.status
 	$(MKDIR) -p /etc/kernel/postinst.d /etc/kernel/postrm.d
-	$(INSTALL) -g root -o root -T centos7/postinst.d_99-sign-kernel.sh \
+	$(INSTALL) -m 755 -g root -o root -T centos7/postinst.d_99-sign-kernel.sh \
 		/etc/kernel/postinst.d/99-sign-kernel.sh
-	$(INSTALL) -g root -o root -T centos7/postrm.d_99-sign-kernel.sh \
+	$(INSTALL) -m 755 -g root -o root -T centos7/postrm.d_99-sign-kernel.sh \
 		/etc/kernel/postrm.d/99-sign-kernel.sh
 	$(TOUCH) $@
 
@@ -250,6 +271,6 @@ backup/%.esl:
 	$(EFIREADVAR) -v $* -o $@
 
 .PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys \
-  password install-boot-entry install-image install-efi-keys install \
-  fedora30-install debian9-install debian10-install ubuntu-install \
+  password install-boot-entry install-image install-efi-keys install-dkms-hook \
+  install fedora30-install debian9-install debian10-install ubuntu-install \
   centos7-install
