@@ -38,6 +38,10 @@ done <<< "$dkms_status"
 mod_count="$i"
 
 flagdir="$(mktemp -d)"
+cleanup () {
+    rm -rf "$flagdir"
+}
+trap cleanup EXIT
 
 # install hooks for modules
 for ((i=0; i<mod_count; i++)) ; do
@@ -72,5 +76,4 @@ for ((i=0; i<mod_count; i++)) ; do
 done
 
 # cleanup
-rm -rf "$flagdir"
 exit 0
