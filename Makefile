@@ -185,7 +185,7 @@ install: install-efi-keys install-gpg-keys install-image install-boot-entry \
 fedora30-install: fedora30-sign.status install
 
 fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status \
-  install-gpg-keys.status
+  install-gpg-keys.status setup-dkms.status
 	$(RPM) -q kernel-core | $(GREP) -Po '(?<=kernel-core-)\S+' | \
 		while read -r ver ; do \
 			/etc/kernel/install.d/99-sign-kernel.install \
@@ -213,7 +213,7 @@ debian10-install: debian9-install
 ubuntu-install: debian9-install
 
 debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status \
-  install-gpg-keys.status
+  install-gpg-keys.status setup-dkms.status
 	$(FIND) /boot/ -maxdepth 1 -type f -name 'vmlinu[xz]-*' \
 		-and -not -name \*.sig | $(GREP) -Po '(?<=^/boot/vmlinu[xz]-)\S+$$' | \
 			while read -r ver ; do \
@@ -240,7 +240,7 @@ debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
 centos7-install: centos7-sign.status install
 
 centos7-sign.status: centos7-grub-signer.status centos7-kernel-signer.status \
-  install-gpg-keys.status
+  install-gpg-keys.status setup-dkms.status
 	$(RPM) -q kernel | $(GREP) -Po '(?<=kernel-)\S+' | \
 		while read -r ver ; do \
 			/etc/kernel/postinst.d/99-sign-kernel.sh $$ver ; \
