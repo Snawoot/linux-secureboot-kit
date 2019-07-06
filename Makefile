@@ -237,7 +237,7 @@ debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
 	$(INSTALL) -m 755 -g root -o root -T debian9/postrm.d_zzz-sign-kernel \
 		/etc/kernel/postrm.d/zzz-sign-kernel
 	$(INSTALL) -m 755 -o root -g root -d /usr/share/initramfs-tools/conf-hooks.d
-	$(INSTALL) -m 755 -o root -g root -t /usr/share/initramfs-tools/conf-hooks.d \
+	$(INSTALL) -m 644 -o root -g root -t /usr/share/initramfs-tools/conf-hooks.d \
 		zzz-sign-initramfs
 	$(TOUCH) $@
 

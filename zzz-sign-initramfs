@@ -1,5 +1,15 @@
 #!/bin/sh
 
+lsbk_mkinitramfs_ppid=$PPID
+case "$(tr '\0' ' ' < /proc/$PPID/cmdline )" in
+    *update-initramfs*)
+        lsbk_track_file=yes
+        ;;
+    *)
+        lsbk_track_file=no
+        ;;
+esac
+
 lsbk_sign_filter () {
     ${lsbk_real_compress}
     rc=$?
@@ -10,10 +20,30 @@ lsbk_sign_filter () {
     GPG=$(command -v gpg 2>/dev/null)
     GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
     GPG_SIGN_KEYID="bootsigner@localhost"
-    "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" \
-        --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${stdout_path}" \
-        > "${stdout_path}.sig" && \
-    { >&2 echo "linux-secureboot-kit: successfully signed ramdrive '$outfile'!" ; } || :
+    if "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" \
+    --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${stdout_path}" \
+    > "${stdout_path}.sig" ; then
+        >&2 echo "linux-secureboot-kit: successfully signed ramdrive '$stdout_path'!"
+        if [ "$lsbk_track_file" = "yes" ] ; then
+            # daemonize deferred move action
+            waiter_source="$(cat <<'EOF'
+stdout_path="$0"
+lsbk_mkinitramfs_ppid="$1"
+mypid=$(exec sh -c 'echo $PPID')
+tail --pid=$lsbk_mkinitramfs_ppid -f /dev/null
+new_path="$(readlink -f /proc/$mypid/fd/9)"
+[ -r "$new_path" ] && {
+    >&2 echo "initramdrive installed to \"$new_path\". moving signature..."
+    >&2 mv -v "${stdout_path}.sig" "${new_path}.sig"
+}
+EOF
+)"
+            setsid sh -c "$waiter_source" "$stdout_path" "$lsbk_mkinitramfs_ppid" \
+                </dev/null 3>/dev/null 4>/dev/null 5>/dev/null 9<"$stdout_path" &
+        fi
+    else
+        :
+    fi
     return $rc
 }
 
