@@ -89,7 +89,7 @@ memdisk.tar: boot/grub/grub.cfg
 
 clean:
 	$(RM) -rf grub-verify-unsigned.efi grub-verify.efi memdisk.tar \
-		PK.key PK.crt KEK.key KEK.crt db.key db.crt gpg-home pubkey.gpg \
+		PK.key PK.crt KEK.key KEK.crt db.key db.crt db.der gpg-home pubkey.gpg \
 		grub.passwd grub.passwd.tmp grub.cfg PK.esl PK.auth *.status boot \
 		PK.crt.uuid condmodules.lst
 
