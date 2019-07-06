@@ -201,9 +201,10 @@ fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
 	$(TOUCH) $@
 
 fedora30-kernel-signer.status: fedora30/99-sign-kernel.install \
-  install-gpg-keys.status
+  install-gpg-keys.status dracut_lsbk_sign.conf
 	$(MKDIR) -p /etc/kernel/install.d
 	$(INSTALL) -g root -o root -t /etc/kernel/install.d $<
+	$(INSTALL) -m 644 -g root -o root dracut_lsbk_sign.conf /etc/dracut.conf.d/99-lsbk-sign.conf
 	$(TOUCH) $@
 
 debian9-install: debian9-sign.status install
@@ -263,6 +264,7 @@ centos7-kernel-signer.status: centos7/postinst.d_99-sign-kernel.sh \
 		/etc/kernel/postinst.d/99-sign-kernel.sh
 	$(INSTALL) -m 755 -g root -o root -T centos7/postrm.d_99-sign-kernel.sh \
 		/etc/kernel/postrm.d/99-sign-kernel.sh
+	$(INSTALL) -m 644 -g root -o root dracut_lsbk_sign.conf /etc/dracut.conf.d/99-lsbk-sign.conf
 	$(TOUCH) $@
 
 backup/%.esl:
