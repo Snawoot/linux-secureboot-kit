@@ -173,7 +173,7 @@ install-dkms-hook.status: chain-sign-hook.conf
 
 setup-dkms: setup-dkms.status
 
-setup-dkms.status: setup_dkms.sh install-dkms-hook.status
+setup-dkms.status: setup_dkms.sh install-dkms-hook.status install-efi-keys.status
 	$(INSTALL) -d -m 755 -o root -g root /var/lib/secureboot/dkms
 	$(INSTALL) -m 755 -o root -g root -t /var/lib/secureboot/dkms $<
 	/var/lib/secureboot/dkms/$<
