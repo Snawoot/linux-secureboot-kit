@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sign_filter () {
+lsbk_sign_filter () {
     ${lsbk_real_compress}
     rc=$?
     mypid=$(exec sh -c 'echo $PPID')
@@ -27,4 +27,4 @@ fi
 [ "${compress}" = xz ] && compress="xz --check=crc32"
 
 lsbk_real_compress=${compress}
-compress=sign_filter
+compress=lsbk_sign_filter
