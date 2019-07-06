@@ -276,4 +276,4 @@ backup/%.esl:
 .PHONY: clean image all pgp-key efi-keys efi-keys-backup install-gpg-keys \
   password install-boot-entry install-image install-efi-keys install-dkms-hook \
   install fedora30-install debian9-install debian10-install ubuntu-install \
-  centos7-install
+  centos7-install setup-dkms
