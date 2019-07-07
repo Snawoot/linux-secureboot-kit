@@ -116,3 +116,17 @@ Actually, you may just run single command with final target for your system and 
 ### Step 7. Lockdown your system
 
 Ensure Secure Boot is enabled in your BIOS settings and administrator password is set. Set 'SignedBoot' UEFI boot entry as your first boot option.
+
+## Notes
+
+### DKMS and custom modules
+
+Linux kernel in some distrubutions requires all modules to be signed with trusted signature when Secure Boot is enabled. Some distros (like Ubuntu) even offer mechanism for signing DKMS modules after build with enrolled MOK keys. Since we already own all platform keys, we don't need to enroll additional MOK keys into UEFI - we can sign modules with db keys instead. linux-secureboot-kit sets own hooks in order to supress signature with MOK keys and put it's own. Such hook chained after original DKMS source hooks via override file in `/etc/dkms`. Symlinks to override file created for every installed DKMS package upon linux-secureboot-kit setup. If you will install some new DKMS after linux-secureboot-kit setup, you have to create such symlink like this:
+
+```bash
+ln -s /var/lib/secureboot/dkms/chain-sign-hook.conf /etc/dkms/<package_name>.conf
+```
+
+or just re-run `setup_dkms.sh` script from this source directory. It'll add missing symlinks and initiate rebuild of unsigned modules.
+
+If you are building modules manually, you may sign them with `/var/lib/secureboot/efi-keys/db.key" and `/var/lib/secureboot/efi-keys/db.der` using tool like `kmodsign` in Ubuntu or `scripts/sign\_file` from kernel source directory (see [this issue](https://github.com/Snawoot/linux-secureboot-kit/issues/3) for example).

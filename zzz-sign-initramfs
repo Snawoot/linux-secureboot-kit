@@ -1,0 +1,71 @@
+#!/bin/sh
+
+lsbk_mkinitramfs_ppid=$PPID
+case "$(tr '\0' ' ' < /proc/$PPID/cmdline )" in
+    *update-initramfs*)
+        lsbk_track_file=yes
+        ;;
+    *)
+        lsbk_track_file=no
+        ;;
+esac
+
+lsbk_sign_filter () {
+    ${lsbk_real_compress}
+    rc=$?
+    mypid=$(exec sh -c 'echo $PPID')
+    stdout_path="$(readlink -f /proc/$mypid/fd/1)"
+    exec > /dev/null
+    GPG=$(command -v gpg2 2>/dev/null) || \
+    GPG=$(command -v gpg 2>/dev/null)
+    GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
+    GPG_SIGN_KEYID="bootsigner@localhost"
+    if "$GPG" --quiet --no-permission-warning --homedir "${GPG_SIGN_HOMEDIR}" \
+    --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${stdout_path}" \
+    > "${stdout_path}.sig" ; then
+        >&2 echo "linux-secureboot-kit: successfully signed ramdrive '$stdout_path'!"
+        # also track temporary outputs
+        case "$stdout_path" in
+            *.tmp|*.new)
+                lsbk_track_file=yes
+                ;;
+            *)
+                :
+                ;;
+        esac
+        if [ "$lsbk_track_file" = "yes" ] ; then
+            # daemonize deferred move action
+            waiter_source="$(cat <<'EOF'
+stdout_path="$0"
+lsbk_mkinitramfs_ppid="$1"
+mypid=$(exec sh -c 'echo $PPID')
+tail --pid=$lsbk_mkinitramfs_ppid -f /dev/null
+new_path="$(readlink -f /proc/$mypid/fd/9)"
+if [ -r "$new_path" ] ; then
+    >&2 echo "initramdrive installed to \"$new_path\". moving signature..."
+    >&2 mv -v "${stdout_path}.sig" "${new_path}.sig"
+else
+    rm -f "${stdout_path}.sig"
+fi
+EOF
+)"
+            setsid sh -c "$waiter_source" "$stdout_path" "$lsbk_mkinitramfs_ppid" \
+                </dev/null 3>/dev/null 4>/dev/null 5>/dev/null 9<"$stdout_path" &
+        fi
+    else
+        :
+    fi
+    return $rc
+}
+
+if [ -z "${compress:-}" ]; then
+    compress=${COMPRESS}
+else
+    COMPRESS=${compress}
+fi
+
+[ "${compress}" = lzop ] && compress="lzop -9"
+[ "${compress}" = xz ] && compress="xz --check=crc32"
+
+lsbk_real_compress=${compress}
+compress=lsbk_sign_filter

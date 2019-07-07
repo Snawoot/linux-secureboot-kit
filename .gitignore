@@ -6,6 +6,7 @@ grub-verify.efi
 *.key
 *.esl
 *.auth
+*.der
 gpg-home
 grub.cfg
 grub.passwd
