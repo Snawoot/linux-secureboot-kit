@@ -9,6 +9,13 @@ Even if your hard disk is encrypted with full disk encryption, your bootloader c
 
 This kit establishes following signature verification chain: UEFI Secure Boot -> Custom GRUB2 Image with your embedded verification keys -> Signed kernel, initramrs, grub config.
 
+## Features
+
+* Risk-free deployment. You may rollback to old bootloader in any time just by disabling Secure Boot and choosing original bootloader in your boot menu.
+* No foreign code can be run on such protected machine, including live system images signed by vendor certificates.
+* Support for automatic signature of DKMS-built modules.
+* No MOK key enrollment required.
+
 ## How to use it?
 
 Here is step by step guide:
