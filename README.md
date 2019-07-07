@@ -12,7 +12,7 @@ This kit establishes following signature verification chain: UEFI Secure Boot ->
 ## Features
 
 * Risk-free deployment. Old bootloader is retained after installation and it is possible to fallback to it at any time. If something went wrong just disable Secure Boot and choose original bootloader in your boot menu.
-* No foreign code can be run on such protected machine, including live system images signed by vendor certificates.
+* No foreign code can be run on such protected machine, including live system images signed with vendor certificates.
 * Support for automatic signature of DKMS-built modules.
 * No MOK key enrollment required.
 
