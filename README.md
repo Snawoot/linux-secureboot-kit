@@ -24,7 +24,7 @@ Here is step by step guide:
 
 1. x64 UEFI-enabled Linux installation with GRUB2 bootloader
 2. GRUB2 config without `blscfg` directives (they will fail boot since all files will have to be signed). Where applicable it is disabled automatically upon installation via `GRUB_ENABLE_BLSCFG="false"` variable in `/etc/default/grub`
-3. GRUB2 tools and modules (grub2-efi-x64-modules and grub2-tools on RPM-based distros, Debian-based provides them by default)
+3. GRUB2 tools and modules (`grub2-efi-x64-modules` and `grub2-tools` packages on RPM-based distros, Debian-based provides them by default)
 4. sbsigntools (sbsigntool) 0.6+ (https://git.kernel.org/pub/scm/linux/kernel/git/jejb/sbsigntools.git/). If it is absent in your distro or too old, you have two options:
    * Use [static build](https://gist.github.com/Snawoot/a8f0863f362ed328b6bff00a3717f175). HEAD commit of this gist can be verified with [my PGP public key](https://keybase.io/yarmak/pgp_keys.asc). See install instructions in gist comment.
    * Build it yourself. You'll need:
