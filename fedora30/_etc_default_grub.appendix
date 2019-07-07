@@ -41,4 +41,4 @@ sign() {
    cleanup
 }
 trap sign EXIT
-trap cleanup TERM INT 
+trap cleanup TERM INT
