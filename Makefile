@@ -196,8 +196,7 @@ fedora30-sign.status: fedora30-grub-signer.status fedora30-kernel-signer.status 
 
 fedora30-grub-signer.status: fedora30/_etc_default_grub.appendix \
   install-gpg-keys.status
-	echo >> /etc/default/grub
-	$(CAT) $< >> /etc/default/grub
+	$(GREP) -F -q 'bootsigner@localhost' /etc/default/grub || $(CAT) $< >> /etc/default/grub
 	$(TOUCH) $@
 
 fedora30-kernel-signer.status: fedora30/99-sign-kernel.install \
@@ -225,8 +224,7 @@ debian9-sign.status: debian9-grub-signer.status debian9-kernel-signer.status \
 
 debian9-grub-signer.status: debian9/_etc_default_grub.appendix \
   install-gpg-keys.status
-	echo >> /etc/default/grub
-	$(CAT) $< >> /etc/default/grub
+	$(GREP) -F -q 'bootsigner@localhost' /etc/default/grub || $(CAT) $< >> /etc/default/grub
 	$(TOUCH) $@
 
 debian9-kernel-signer.status: debian9/postinst.d_zzz-sign-kernel \
@@ -254,10 +252,7 @@ centos7-sign.status: centos7-grub-signer.status centos7-kernel-signer.status \
 
 centos7-grub-signer.status: centos7/_etc_default_grub.appendix \
   install-gpg-keys.status
-	echo >> /etc/default/grub
-	$(CAT) $< >> /etc/default/grub
-	$(SED) -i -re '/(\s*)if\s+grub_file_is_not_garbage/i echo "$$i" | grep -q .sig\\\$$ && continue' \
-		/etc/grub.d/10_linux /etc/grub.d/20_linux_xen
+	$(GREP) -F -q 'bootsigner@localhost' /etc/default/grub || $(CAT) $< >> /etc/default/grub
 	$(TOUCH) $@
 
 centos7-kernel-signer.status: centos7/postinst.d_99-sign-kernel.sh \
