@@ -136,4 +136,4 @@ ln -s /var/lib/secureboot/dkms/chain-sign-hook.conf /etc/dkms/<package_name>.con
 
 or just re-run `setup_dkms.sh` script from this source directory. It'll add missing symlinks and initiate rebuild of unsigned modules.
 
-If you are building modules manually, you may sign them with `/var/lib/secureboot/efi-keys/db.key` and `/var/lib/secureboot/efi-keys/db.der` using tool like `kmodsign` in Ubuntu or `scripts/sign\_file` from kernel source directory (see [this issue](https://github.com/Snawoot/linux-secureboot-kit/issues/3) for example).
+If you are building modules manually, you may sign them with `/var/lib/secureboot/efi-keys/db.key` and `/var/lib/secureboot/efi-keys/db.der` using tool like `kmodsign` in Ubuntu or `scripts/sign_file` from kernel source directory (see [this issue](https://github.com/Snawoot/linux-secureboot-kit/issues/3) for example).
