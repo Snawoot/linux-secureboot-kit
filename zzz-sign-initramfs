@@ -24,6 +24,15 @@ lsbk_sign_filter () {
     --detach-sign --default-key "${GPG_SIGN_KEYID}" < "${stdout_path}" \
     > "${stdout_path}.sig" ; then
         >&2 echo "linux-secureboot-kit: successfully signed ramdrive '$stdout_path'!"
+        # also track temporary outputs
+        case "$stdout_path" in
+            *.tmp|*.new)
+                lsbk_track_file=yes
+                ;;
+            *)
+                :
+                ;;
+        esac
         if [ "$lsbk_track_file" = "yes" ] ; then
             # daemonize deferred move action
             waiter_source="$(cat <<'EOF'
@@ -32,10 +41,12 @@ lsbk_mkinitramfs_ppid="$1"
 mypid=$(exec sh -c 'echo $PPID')
 tail --pid=$lsbk_mkinitramfs_ppid -f /dev/null
 new_path="$(readlink -f /proc/$mypid/fd/9)"
-[ -r "$new_path" ] && {
+if [ -r "$new_path" ] ; then
     >&2 echo "initramdrive installed to \"$new_path\". moving signature..."
     >&2 mv -v "${stdout_path}.sig" "${new_path}.sig"
-}
+else
+    rm -f "${stdout_path}.sig"
+fi
 EOF
 )"
             setsid sh -c "$waiter_source" "$stdout_path" "$lsbk_mkinitramfs_ppid" \
