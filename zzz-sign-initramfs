@@ -16,6 +16,14 @@ lsbk_sign_filter () {
     mypid=$(exec sh -c 'echo $PPID')
     stdout_path="$(readlink -f /proc/$mypid/fd/1)"
     exec > /dev/null
+    case "${stdout_path}" in
+        *.sig)
+            # No need to generate signature for signature
+            return $rc
+        *)
+            :
+            ;;
+    esac
     GPG=$(command -v gpg2 2>/dev/null) || \
     GPG=$(command -v gpg 2>/dev/null)
     GPG_SIGN_HOMEDIR="/var/lib/secureboot/gpg-home"
