@@ -14,4 +14,5 @@ set superusers=root
 password_pbkdf2 root ${GRUB_ROOT_PASSWD}
 
 set check_signatures=enforce
+export check_signatures
 EOF
