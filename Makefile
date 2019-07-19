@@ -15,9 +15,9 @@ GRUB2MODULES= all_video boot btrfs cat chain configfile echo efifwsetup \
   part_msdos part_gpt password_pbkdf2 png reboot search search_fs_uuid \
   search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs \
   backtrace usb usbserial_common usbserial_pl2303 usbserial_ftdi \
-  usbserial_usbdebug linux tar memdisk verify gcry_rsa gcry_dsa gcry_sha256 \
+  usbserial_usbdebug linux tar memdisk gcry_rsa gcry_dsa gcry_sha256 \
   hashsum
-GRUB2CONDMODULES=increment blscfg linuxefi
+GRUB2CONDMODULES=increment blscfg verify pgp
 GRUB2EXTRAMODULES=
 RM=rm
 MKDIR=mkdir
