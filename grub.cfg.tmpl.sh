@@ -13,6 +13,10 @@ set gfxmode=auto
 set superusers=root
 password_pbkdf2 root ${GRUB_ROOT_PASSWD}
 
+function linuxefi {
+    linux "$@"
+}
+
 set check_signatures=enforce
 export check_signatures
 EOF
