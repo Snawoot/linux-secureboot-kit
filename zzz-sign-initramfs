@@ -20,6 +20,7 @@ lsbk_sign_filter () {
         *.sig)
             # No need to generate signature for signature
             return $rc
+            ;;
         *)
             :
             ;;
