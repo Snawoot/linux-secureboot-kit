@@ -1,6 +1,19 @@
 # linux-secureboot-kit
 Tool for complete hardening of Linux boot chain with UEFI Secure Boot. Inspired by [Hanno Heinrichs and Florent Hochwelker blog post](https://www.crowdstrike.com/blog/enhancing-secure-boot-chain-on-fedora-29/).
 
+---
+
+:heart: :heart: :heart:
+
+You can say thanks to the author by donations to these wallets:
+
+- ETH: `0xB71250010e8beC90C5f9ddF408251eBA9dD7320e`
+- BTC:
+  - Legacy: `1N89PRvG1CSsUk9sxKwBwudN6TjTPQ1N8a`
+  - Segwit: `bc1qc0hcyxc000qf0ketv4r44ld7dlgmmu73rtlntw`
+
+---
+
 ## Why?
 
 Even if your hard disk is encrypted with full disk encryption, your bootloader config or initramdrive may be spoofed while you left your computer unattended. And this way your encryption key may be silently extracted when you unlock your system next time.
